@@ -17,7 +17,8 @@
 <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-<div class="glow" aria-hidden="true"></div>
+<div class="glow" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="grain" aria-hidden="true"></div>
 
 <!-- Home: body parts -->
 <section class="view" id="home">
@@ -60,6 +61,11 @@
     </div>
   </div>
   <div class="center">
+    <svg class="dial" id="dial" viewBox="-100 -100 200 200" aria-hidden="true">
+      <g id="ticks"></g>
+      <circle class="sweep" id="sweep" r="88" pathLength="1000"/>
+      <circle class="tip" id="tip" r="2.4" cx="0" cy="-88"/>
+    </svg>
     <div id="time"><span id="mm">0:00</span><span class="cs" id="cs">.00</span></div>
     <div class="status" id="status" aria-live="polite"></div>
   </div>

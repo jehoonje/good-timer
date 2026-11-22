@@ -69,36 +69,52 @@
   const findEx = id => { for (const p in EX) for (const e of EX[p]) if (e[0] === id) return { id: e[0], name: e[1], equip: e[2], target: e[3], part: p }; return null; };
 
   /* ---------- Figure ---------- */
+  // Anatomy chart: left half drawn once, mirrored for the right. Each muscle names the part it belongs to.
+  const FRONT = [
+    ["", "M44.5 27 Q39 30 34 32.5 L44 32 Z"],
+    ["shoulder", "M35 32.5 Q26 33 24.5 44 Q26.5 47.5 29.5 47 Q30.5 39 36.5 35.5 Z", "M33 34.5 Q28 37 26.5 43 M31 34 Q29 39 28.5 45"],
+    ["chest", "M49.2 34.5 L38 35.5 Q31.5 39 32 47.5 Q38.5 53.5 49.2 50.5 Z", "M48 37.5 Q40 40 34 46 M48.5 42 Q41 44 35.5 49 M48.5 46.5 Q43 48 38.5 51"],
+    ["", "M24.5 47.5 Q22 55 23 63 L28.5 63 Q30.5 55 30 48.5 Z"],
+    ["", "M23 65 Q19.5 75 19.5 85 L23.5 85.5 Q27.5 75 28.5 65 Z"],
+    ["", "M33 50 Q32.5 64 36 80 L42.5 83 L42.5 54 Q37 54 33 50 Z"],
+    ["", "M43.6 53 h5.6 v6.5 h-5.6 Z"],
+    ["", "M43.6 60.5 h5.6 v6.5 h-5.6 Z"],
+    ["", "M43.6 68 h5.6 v6.5 h-5.6 Z"],
+    ["", "M43.6 75.5 L49.2 75.5 L49.2 88 Q45 84 43.6 80 Z"],
+    ["legs", "M42 88 Q35 96 35.5 110 Q36.5 120 39 125 L44 124 Q47.5 110 48.5 94 Q46 90 42 88 Z", "M42.5 92 Q39 106 40.5 122 M46 96 Q44 108 42.5 121"],
+    ["legs", "M49 93 Q48.5 104 46.5 112 L49.2 108 Z"],
+    ["legs", "M46.5 113 Q49.5 119 46 126.5 L43.8 124.5 Q45 118 46.5 113 Z"],
+    ["legs", "M38.5 132 Q36 143 38.5 157 L41.2 158 Q40.8 144 41.8 132 Z"],
+    ["legs", "M42.8 132 Q46.2 142 44.2 157 L42.2 158 Q41.8 145 42.8 132 Z"]
+  ];
+  const BACK = [
+    ["back", "M50 22 L50 60 Q46.5 51 43.5 41 L35 33 Q42 29.5 46 24 Z", "M48 27 Q43 32 37 33.5 M49 36 Q46 40 44.5 44"],
+    ["shoulder", "M35 32.5 Q26 33 24.5 44 Q26.5 47.5 29.5 47 Q30.5 39 36.5 35.5 Z"],
+    ["back", "M43 41.5 Q37.5 37.5 34 41 Q34.5 47 40.5 49.5 L44.5 46.5 Z"],
+    ["back", "M34 48.5 Q32.5 60 37 72 Q42 78.5 47.6 80.5 L47.2 63 Q44 53 40.5 50.5 Z", "M36 54 Q39 64 46 76 M39 52 Q42 61 47 70"],
+    ["back", "M48.6 61.5 L49.4 61.5 L49.4 88 L46.6 88 Q47.6 74 48.6 61.5 Z"],
+    ["", "M24.5 47.5 Q22 55 23 63 L28.5 63 Q30.5 55 30 48.5 Z"],
+    ["", "M23 65 Q19.5 75 19.5 85 L23.5 85.5 Q27.5 75 28.5 65 Z"],
+    ["legs", "M49.4 89 Q40 86 37 93.5 Q37.5 101 43 103 Q48 103 49.4 100 Z"],
+    ["legs", "M48.5 104.5 Q40 103.5 37 106.5 Q35.5 116 39 126 L44 126 Q48 116 48.5 104.5 Z", "M42.5 105 Q41.5 115 41.5 125"],
+    ["legs", "M38.5 131 Q35 140 38 150 L43.5 151 Q46.5 140 44.5 131 Z"]
+  ];
+  const SKIN = `
+    <path class="sk" d="M45 21 L55 21 L56.5 30 L43.5 30 Z"/>
+    <ellipse class="sk" cx="50" cy="13" rx="8.2" ry="10"/>`;
+  const SKIN_HALF = `
+    <ellipse class="sk" cx="21.2" cy="90.5" rx="3.1" ry="5"/>
+    <ellipse class="sk" cx="41.6" cy="128.5" rx="3.4" ry="3"/>
+    <path class="sk" d="M39.5 151.5 L42.8 151.5 L42.4 159.5 L39.8 159.5 Z"/>
+    <ellipse class="sk" cx="41" cy="163" rx="4" ry="2.4"/>`;
   function figure(part) {
-    const v = PARTS[part].view;
-    const hl = (k) => k === part ? "hl" : "b";
-    const hla = (k) => k === part ? "a hla" : "a";
-    const limbs = (cls, w1, w2) => `
-      <path class="${cls}" stroke-width="${w1}" d="M28 44 L23 72"/><path class="${cls}" stroke-width="${w2}" d="M23 73 L21 96"/>
-      <path class="${cls}" stroke-width="${w1}" d="M72 44 L77 72"/><path class="${cls}" stroke-width="${w2}" d="M77 73 L79 96"/>`;
-    const legs = `
-      <path class="${hla("legs")}" stroke-width="12" d="M42 92 L41 124"/><path class="${hla("legs")}" stroke-width="12" d="M58 92 L59 124"/>
-      <path class="${hla("legs")}" stroke-width="9" d="M41 128 L41 152"/><path class="${hla("legs")}" stroke-width="9" d="M59 128 L59 152"/>`;
-    const base = `
-      <circle class="b" cx="50" cy="15" r="9"/>
-      <rect class="b" x="45.5" y="23" width="9" height="8" rx="2"/>
-      <path class="b" d="M32 33 Q50 28 68 33 L66 79 Q50 83 34 79 Z"/>
-      <path class="b" d="M34 79 L66 79 L64 92 L36 92 Z"/>`;
-    let detail;
-    if (v === "back") {
-      detail = `
-        <path class="${hl("back")}" d="M41 30 L59 30 L56 43 L44 43 Z"/>
-        <path class="${hl("back")}" d="M34 41 Q30 58 41 73 L48.5 70 L48.5 45 Z"/>
-        <path class="${hl("back")}" d="M66 41 Q70 58 59 73 L51.5 70 L51.5 45 Z"/>`;
-    } else {
-      detail = `
-        <path class="${hl("chest")}" d="M36 38 Q44 34.5 49 37.5 L49 50 Q42 54.5 36 50 Z"/>
-        <path class="${hl("chest")}" d="M64 38 Q56 34.5 51 37.5 L51 50 Q58 54.5 64 50 Z"/>
-        <path class="b" d="M44 56 h12 M44 63 h12 M44 70 h12" fill="none"/>`;
-    }
-    const delts = `<circle class="${hl("shoulder")}" cx="30" cy="38" r="6.5"/><circle class="${hl("shoulder")}" cx="70" cy="38" r="6.5"/>`;
-    return `<svg class="figure" viewBox="0 0 100 160" style="--pt:var(${PARTS[part].tone})" aria-hidden="true">
-      ${limbs("a", 8, 7)}${legs}${base}${detail}${delts}</svg>`;
+    const set = PARTS[part].view === "back" ? BACK : FRONT;
+    const half = SKIN_HALF + set.map(([k, d, fib]) => {
+      const on = k === part;
+      return `<path class="${on ? "m hl" : "m"}" d="${d}"/>${on && fib ? `<path class="hl-fib" d="${fib}"/>` : ""}`;
+    }).join("");
+    return `<svg class="figure" viewBox="0 0 100 170" style="--pt:var(${PARTS[part].tone})" aria-hidden="true">
+      ${SKIN}<g>${half}</g><g transform="translate(100 0) scale(-1 1)">${half}</g></svg>`;
   }
 
   /* ---------- State ---------- */
@@ -128,9 +144,10 @@
   const fmt = ms => split(ms).join("");
   const fmtShort = ms => split(ms)[0];
 
-  /* ---------- Views ---------- */
+  /* ---------- Views & motion ---------- */
   let view = "home", curPart = null;
   const setTone = part => document.body.style.setProperty("--tone", part ? `var(${PARTS[part].tone})` : "var(--cool)");
+  const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function show(v) {
     view = v;
@@ -142,12 +159,37 @@
     window.scrollTo(0, 0);
   }
 
+  // Run a view change with a View Transition (shared hero figure + directional slide), or a CSS fallback.
+  let navBusy = false;
+  function go(dir, update) {
+    if (navBusy) return;
+    if (reduced() || !document.startViewTransition) {
+      update();
+      const el = { home: $("home"), list: $("list"), timer: $("pad") }[view];
+      if (!reduced() && el) {
+        el.classList.remove("enter", "enter-back"); void el.offsetWidth;
+        el.classList.add(dir === "back" ? "enter-back" : "enter");
+      }
+      return;
+    }
+    navBusy = true;
+    document.documentElement.dataset.dir = dir;
+    const t = document.startViewTransition(update);
+    t.finished.finally(() => {
+      navBusy = false;
+      document.querySelectorAll("[data-vt]").forEach(el => { el.style.viewTransitionName = ""; el.removeAttribute("data-vt"); });
+    });
+  }
+  const nameHero = el => { if (el) { el.style.viewTransitionName = "hero-fig"; el.setAttribute("data-vt", ""); } };
+
   function renderHome() {
-    $("parts").innerHTML = Object.keys(PARTS).map(k => `
-      <button class="card part" type="button" data-part="${k}" style="--pt:var(${PARTS[k].tone})">
+    $("parts").innerHTML = Object.keys(PARTS).map((k, i) => `
+      <button class="card part rise" type="button" data-part="${k}" style="--pt:var(${PARTS[k].tone});--i:${i}">
         <div class="fig">${figure(k)}</div>
-        <div><div class="name">${PARTS[k].name}</div>
-        <div class="meta"><i>${PARTS[k].en}</i> · 운동 ${EX[k].length}개</div></div>
+        <div class="label">
+          <div><div class="name">${PARTS[k].name}</div><div class="meta">${PARTS[k].en}</div></div>
+          <span class="count">${EX[k].length}</span>
+        </div>
       </button>`).join("");
     renderResume();
     setTone(active() ? s.ex.part : null);
@@ -159,8 +201,8 @@
     if (!active()) { slot.innerHTML = ""; return; }
     const ex = findEx(s.ex.id);
     const state = s.phase === "rest" ? `${s.set}세트 완료 · 브레이크 중` : `${s.set}세트 진행중`;
-    slot.innerHTML = `<button class="resume" type="button" id="resumeBtn" style="--tone:var(${PARTS[ex.part].tone})">
-      <span><b>${ex.name}</b><small>${state}</small></span><span class="t" id="resumeT"></span></button>`;
+    slot.innerHTML = `<button class="resume rise" type="button" id="resumeBtn" style="--tone:var(${PARTS[ex.part].tone})">
+      <span><i class="dot"></i><span><b>${ex.name}</b><small>${state}</small></span></span><span class="t" id="resumeT"></span></button>`;
   }
 
   function lastFor(id) {
@@ -175,10 +217,11 @@
     const P = PARTS[part];
     setTone(part);
     $("listFig").innerHTML = figure(part);
+    $("listFig").style.setProperty("--pt", `var(${P.tone})`);
     $("listTitle").textContent = P.name;
     $("listSub").textContent = `${P.en} · ${EX[part].length}개 운동`;
-    $("exs").innerHTML = EX[part].map(([id, name, eq, target]) => `
-      <button class="card ex${active() && s.ex.id === id ? " active" : ""}" type="button" data-ex="${id}" style="--pt:var(${P.tone})">
+    $("exs").innerHTML = EX[part].map(([id, name, eq, target], i) => `
+      <button class="card ex rise${active() && s.ex.id === id ? " active" : ""}" type="button" data-ex="${id}" style="--pt:var(${P.tone});--i:${i}">
         <span class="glyph"><svg viewBox="0 0 24 24">${EQUIP[eq][1]}</svg></span>
         <span><div class="name">${name}</div><div class="tags">${EQUIP[eq][0]} · ${target}</div></span>
         <span class="last">${active() && s.ex.id === id ? "진행 중" : lastFor(id)}</span>
@@ -198,51 +241,71 @@
 
   let toastT = null;
   function toast(msg) {
-    const t = $("toast"); t.textContent = msg; t.hidden = false;
+    const t = $("toast"); t.hidden = true; void t.offsetWidth; t.textContent = msg; t.hidden = false;
     clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 2200);
   }
 
   document.addEventListener("click", e => {
     const p = e.target.closest("[data-part]");
-    if (p) return renderList(p.dataset.part);
+    if (p) { nameHero(p.querySelector(".fig")); return go("fwd", () => renderList(p.dataset.part)); }
     const x = e.target.closest("[data-ex]");
     if (x) {
       if (active() && s.ex.id !== x.dataset.ex) {
         toast(`${s.ex.name}을(를) 먼저 끝내주세요`);
+        const r = $("resumeBtn"); if (r) { r.classList.remove("pulse"); void r.offsetWidth; r.classList.add("pulse"); }
         return;
       }
-      return openTimer(x.dataset.ex);
+      return go("fwd", () => openTimer(x.dataset.ex));
     }
-    if (e.target.closest("#resumeBtn")) return openTimer(s.ex.id);
+    if (e.target.closest("#resumeBtn")) return go("fwd", () => openTimer(s.ex.id));
     if (e.target.closest("[data-history]")) { e.stopPropagation(); return openSheet(); }
   });
-  $("listBack").addEventListener("click", renderHome);
+  $("listBack").addEventListener("click", () => go("back", () => {
+    const from = curPart;
+    renderHome();
+    nameHero(document.querySelector(`[data-part="${from}"] .fig`));
+  }));
   $("timerBack").addEventListener("click", e => {
     e.stopPropagation();
     if (!active()) s = fresh(), save();
-    renderList(curPart);
+    go("back", () => renderList(curPart));
   });
+
+  /* ---------- Dial ---------- */
+  $("ticks").innerHTML = Array.from({ length: 60 }, (_, i) => {
+    const a = i / 60 * Math.PI * 2, major = i % 5 === 0;
+    const r1 = 94, r2 = major ? 99 : 97;
+    const sx = Math.sin(a), cy = -Math.cos(a);
+    return `<line class="tk${major ? " major" : ""}" x1="${(sx * r1).toFixed(2)}" y1="${(cy * r1).toFixed(2)}" x2="${(sx * r2).toFixed(2)}" y2="${(cy * r2).toFixed(2)}"/>`;
+  }).join("");
+  const sweep = $("sweep"), tip = $("tip");
+  function drawDial(ms) {
+    const f = (ms % 60000) / 60000;
+    sweep.style.strokeDasharray = `${(f * 1000).toFixed(1)} 1000`;
+    const a = f * Math.PI * 2;
+    tip.setAttribute("cx", (Math.sin(a) * 88).toFixed(2));
+    tip.setAttribute("cy", (-Math.cos(a) * 88).toFixed(2));
+  }
 
   /* ---------- Timer ---------- */
   const pad = $("pad"), statusEl = $("status"), hintEl = $("hint"), endBtn = $("endBtn");
 
+  const hintFor = () => s.phase === "rest" ? "다음 세트 시작할 때 두 번 탭" : "세트가 끝나면 두 번 탭";
   function renderStatus() {
     if (view === "timer") document.body.dataset.phase = s.phase;
     let html = "";
     if (s.phase === "idle") {
       html = `<div class="line now">1세트 진행중</div>`;
       $("setLabel").textContent = "SET 1";
-      hintEl.textContent = "세트가 끝나면 두 번 탭";
     } else if (s.phase === "rest") {
-      html = `<div class="line done">${s.set}세트 완료</div><div class="line now">${ordinal(s.set)} 브레이크 중</div>`;
+      html = `<div class="line done">${s.set}세트 완료</div><div class="line now" style="--i:1">${ordinal(s.set)} 브레이크 중</div>`;
       $("setLabel").textContent = "BREAK " + s.set;
-      hintEl.textContent = "다음 세트 시작할 때 두 번 탭";
     } else {
-      html = `<div class="line done">${s.set - 1}세트 완료</div><div class="line done">브레이크 완료</div>
-              <div class="line now">${s.set}세트 진행중</div><div class="sub" id="setElapsed"></div>`;
+      html = `<div class="line done">${s.set - 1}세트 완료</div><div class="line done" style="--i:1">브레이크 완료</div>
+              <div class="line now" style="--i:2">${s.set}세트 진행중</div><div class="sub" id="setElapsed"></div>`;
       $("setLabel").textContent = "SET " + s.set;
-      hintEl.textContent = "세트가 끝나면 두 번 탭";
     }
+    hintEl.textContent = hintFor();
     statusEl.innerHTML = html;
     $("log").innerHTML = s.breaks.map(b => `<span><b>${b.n}</b>${fmt(b.duration_ms)}</span>`).join("");
     endBtn.disabled = s.phase === "idle";
@@ -260,6 +323,7 @@
         const el = $("setElapsed");
         if (el) el.textContent = "세트 " + fmtShort(now - s.t0);
       }
+      drawDial(s.phase === "rest" ? ms : s.phase === "work" ? now - s.t0 : 0);
       const [a, b] = split(ms);
       if (mmEl.textContent !== a) mmEl.textContent = a;
       if (csEl.textContent !== b) csEl.textContent = b;
@@ -303,7 +367,7 @@
     } else {
       lastTap = now; pad.dataset.armed = ""; hintEl.textContent = "한 번 더 탭";
       clearTimeout(armT);
-      armT = setTimeout(() => { delete pad.dataset.armed; renderStatus(); }, GAP);
+      armT = setTimeout(() => { delete pad.dataset.armed; hintEl.textContent = hintFor(); }, GAP);
     }
   });
   pad.addEventListener("keydown", e => {
@@ -345,7 +409,7 @@
     const h = loadHistory(); h.unshift(record); saveHistory(h);
     if (window.GTSync) window.GTSync.sync();
     s = fresh(); save();
-    renderList(ex.part);
+    go("back", () => renderList(ex.part));
     openSheet(record);
   }
   confirmable(endBtn, "끝내기", "한 번 더 누르면 저장", endSession);
