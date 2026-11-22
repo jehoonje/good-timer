@@ -229,9 +229,7 @@
 
   function openTimer(id) {
     const ex = findEx(id);
-    if (!s.ex || s.ex.id !== id) { s = fresh({ id: ex.id, name: ex.name, part: ex.part }); }
-    if (s.phase === "idle") s.t0 = Date.now();   // set 1 clock starts when the timer opens
-    save();
+    if (!s.ex || s.ex.id !== id) { s = fresh({ id: ex.id, name: ex.name, part: ex.part }); save(); }
     curPart = ex.part;
     setTone(ex.part);
     $("exName").textContent = ex.name;
@@ -287,6 +285,9 @@
     } else if (s.phase === "rest") {
       html = `<div class="line done">Set ${s.set} complete</div><div class="line now" style="--i:1">Break ${s.set} in progress</div>`;
       $("setLabel").textContent = "BREAK " + s.set;
+    } else if (s.set === 1) {
+      html = `<div class="line now">Set 1 in progress</div>`;
+      $("setLabel").textContent = "SET 1";
     } else {
       html = `<div class="line done">Set ${s.set - 1} complete</div><div class="line done" style="--i:1">Break complete</div>
               <div class="line now" style="--i:2">Set ${s.set} in progress</div>`;
@@ -296,7 +297,41 @@
     statusEl.innerHTML = html;
     renderLog();
     endBtn.disabled = s.phase === "idle";
-    $("timerBack").hidden = s.phase !== "idle";
+    const idle = s.phase === "idle";
+    $("timerBack").hidden = !idle;
+    $("startBtn").hidden = !idle;
+    [$("time"), statusEl, $("foot"), endBtn, $("setLabel")].forEach(el => el.hidden = idle);
+  }
+
+  /* ---------- 3D start button ---------- */
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  const startBtn = $("startBtn");
+  let starting = false;
+  startBtn.addEventListener("pointerdown", () => startBtn.classList.add("pressed"));
+  ["pointerleave", "pointercancel"].forEach(ev => startBtn.addEventListener(ev, () => { if (!starting) startBtn.classList.remove("pressed"); }));
+  startBtn.addEventListener("pointerup", e => e.stopPropagation());
+  startBtn.addEventListener("click", e => { e.stopPropagation(); begin(); });
+  async function begin() {
+    if (starting || s.phase !== "idle") return;
+    starting = true;
+    const rm = reduced();
+    startBtn.classList.add("pressed");
+    try { navigator.vibrate && navigator.vibrate(30); } catch (e) {}
+    if (!rm) {
+      await wait(150);
+      startBtn.classList.remove("pressed");
+      startBtn.classList.add("launch");
+      await wait(460);
+    }
+    const now = Date.now();
+    s.phase = "work"; s.set = 1; s.t0 = now; s.startedAt = now;
+    save(); keepAwake();
+    startBtn.classList.remove("launch", "pressed");
+    renderStatus();
+    if (!rm) [$("time"), statusEl, $("foot")].forEach((el, i) => el.animate(
+      [{ opacity: 0, transform: "translateY(8px) scale(.96)", filter: "blur(10px)" }, { opacity: 1, transform: "none", filter: "none" }],
+      { duration: 700, delay: i * 90, easing: "cubic-bezier(.2,.7,.1,1)", fill: "backwards" }));
+    starting = false;
   }
 
   const mmEl = $("mm"), csEl = $("cs");
@@ -391,7 +426,7 @@
   const GAP = 380;
   let lastTap = 0, armT = null;
   pad.addEventListener("pointerup", e => {
-    if (e.target.closest("button")) return;
+    if (e.target.closest("button") || s.phase === "idle") return;
     const now = performance.now();
     if (now - lastTap < GAP) {
       lastTap = 0; delete pad.dataset.armed; clearTimeout(armT); advance();
@@ -403,7 +438,7 @@
   });
   pad.addEventListener("keydown", e => {
     if (e.target !== pad) return;
-    if (e.key === " " || e.key === "Enter") { e.preventDefault(); advance(); }
+    if (e.key === " " || e.key === "Enter") { e.preventDefault(); s.phase === "idle" ? begin() : advance(); }
   });
 
   function confirmable(btn, idle, armed, action) {

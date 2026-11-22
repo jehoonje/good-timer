@@ -263,6 +263,59 @@ body:is([data-phase="work"], [data-phase="idle"]) #time { color: color-mix(in ok
 body:is([data-phase="work"], [data-phase="idle"]) #time .cs { color: color-mix(in oklab, var(--red) 55%, var(--dim)); }
 body[data-phase="rest"] #time { color: var(--ink); text-shadow: none; }
 body[data-phase="rest"] #time .cs { color: var(--dim); }
+/* 3D start button: a glossy red cap riding on a darker rim; pressing sinks the cap onto the rim. */
+.start {
+  --d: 12px;
+  position: relative; display: block;
+  width: min(54vw, 210px); aspect-ratio: 1; max-width: 100%;
+  padding: 0; margin-bottom: var(--d);
+  background: none; border-radius: 50%; cursor: pointer;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  animation: appear .7s var(--ease) both .15s;
+}
+.start .halo {
+  position: absolute; inset: -18%; border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in oklab, var(--red) 34%, transparent), transparent 72%);
+  animation: halo 3.2s ease-in-out infinite;
+}
+.start .halo::after {
+  content: ""; position: absolute; inset: 16%; border-radius: 50%;
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--red) 40%, transparent);
+  animation: ripple 3.2s ease-out infinite;
+}
+.start .rim {
+  position: absolute; inset: 0; border-radius: 50%;
+  transform: translateY(var(--d));
+  background: linear-gradient(180deg, #a3332b, #4c1411 85%);
+  box-shadow: 0 26px 50px -14px rgba(0, 0, 0, .8), 0 18px 60px -20px color-mix(in oklab, var(--red) 70%, transparent);
+}
+.start .face {
+  position: absolute; inset: 0; border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  background:
+    radial-gradient(60% 45% at 38% 26%, rgba(255, 255, 255, .42), transparent 70%),
+    radial-gradient(circle at 50% 40%, #f0746a, #d9473e 55%, #a9322a 100%);
+  box-shadow: inset 0 2px 1px rgba(255, 255, 255, .35), inset 0 -10px 22px rgba(70, 10, 6, .45), 0 1px 0 rgba(0, 0, 0, .25);
+  color: #fff6f4;
+  transition: transform .16s cubic-bezier(.3, 1.6, .5, 1), box-shadow .16s ease, filter .16s ease;
+}
+.start .lbl { font-family: var(--num); font-weight: 400; font-size: clamp(20px, 6vw, 26px); letter-spacing: .22em; padding-left: .22em; text-shadow: 0 1px 2px rgba(90, 15, 10, .5); }
+.start small { font-size: 10px; letter-spacing: .24em; padding-left: .24em; opacity: .75; }
+.start.pressed .face {
+  transform: translateY(calc(var(--d) - 3px)) scale(.985);
+  box-shadow: inset 0 3px 8px rgba(70, 10, 6, .55), inset 0 -2px 6px rgba(255, 255, 255, .08);
+  filter: brightness(.94);
+  transition-duration: .07s;
+}
+.start.pressed .halo { animation-play-state: paused; opacity: .5; }
+.start.launch { animation: launch .46s var(--ease) forwards; pointer-events: none; }
+.start:focus-visible { outline: none; }
+.start:focus-visible .face { box-shadow: 0 0 0 3px var(--ink), inset 0 2px 1px rgba(255, 255, 255, .35); }
+@keyframes appear { from { opacity: 0; transform: scale(.8) translateY(14px); filter: blur(8px); } }
+@keyframes launch { to { opacity: 0; transform: scale(.82); filter: blur(12px); } }
+@keyframes halo { 50% { transform: scale(1.06); opacity: .75; } }
+@keyframes ripple { from { transform: scale(1); opacity: .9; } to { transform: scale(1.35); opacity: 0; } }
+
 .ghost {
   position: fixed; margin: 0; z-index: 15; pointer-events: none;
   transform-origin: 0 0; will-change: transform, opacity;
@@ -391,7 +444,7 @@ body[data-phase="rest"] #time .cs { color: var(--dim); }
   .part .fig { height: 136px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .glow i, .resume .dot, .status .line.now::before, .figure .hl { animation: none !important; }
+  .glow i, .resume .dot, .status .line.now::before, .figure .hl, .start, .start .halo, .start .halo::after { animation: none !important; }
   .rise, .status .line, #log span, .sheet, .sheet-card, .modal, .modal-card, .toast, .view.enter, .view.enter-back { animation: none !important; }
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
