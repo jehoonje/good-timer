@@ -16,6 +16,8 @@
   --skin: rgba(232, 238, 235, .045);
   --cool: #4f8f95;
   --warm: #d0915f;
+  --red: #e4574d;
+  --mist: #9aa4a6;
   --t-back: #5ba3a8;
   --t-chest: #d68d63;
   --t-shoulder: #9d93cf;
@@ -61,8 +63,8 @@ button { font: inherit; color: inherit; border: 0; }
   width: 40vmax; height: 40vmax; left: 20vw; bottom: -22vmax; opacity: .45; animation-duration: 34s; animation-delay: -15s;
   background: radial-gradient(closest-side, color-mix(in oklab, var(--tone) 40%, #7a8cff 30%), transparent);
 }
-body[data-phase="work"] .glow { opacity: .65; }
-body[data-phase="rest"] .glow { --tone: var(--warm); opacity: .8; }
+body[data-phase="work"] .glow, body[data-phase="idle"] .glow { opacity: .7; }
+body[data-phase="rest"] .glow { opacity: .32; }
 body[data-phase="rest"] .glow i { animation-duration: 11s; }
 @keyframes float {
   0% { transform: translate3d(0, 0, 0) scale(1); }
@@ -257,10 +259,17 @@ h1 {
   transition: color .8s ease, text-shadow .8s ease;
 }
 #time .cs { font-size: .44em; color: var(--dim); margin-left: .04em; }
-body[data-phase="rest"] #time { text-shadow: 0 0 40px color-mix(in oklab, var(--warm) 35%, transparent); }
-body[data-phase="work"] #time { color: var(--dim); }
-body[data-phase="work"] #time .cs { color: var(--faint); }
-body[data-phase="idle"] #time, body[data-phase="idle"] #time .cs { color: var(--faint); }
+body:is([data-phase="work"], [data-phase="idle"]) #time { color: color-mix(in oklab, var(--red) 22%, var(--ink)); text-shadow: 0 0 44px color-mix(in oklab, var(--red) 40%, transparent); }
+body:is([data-phase="work"], [data-phase="idle"]) #time .cs { color: color-mix(in oklab, var(--red) 55%, var(--dim)); }
+body[data-phase="rest"] #time { color: var(--ink); text-shadow: none; }
+body[data-phase="rest"] #time .cs { color: var(--dim); }
+.ghost {
+  position: fixed; margin: 0; z-index: 15; pointer-events: none;
+  transform-origin: 0 0; will-change: transform, opacity;
+  font-family: var(--num); font-weight: 200; font-size: clamp(50px, 16vw, 136px);
+  line-height: 1; letter-spacing: -.025em; font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.ghost .cs { font-size: .44em; margin-left: .04em; }
 
 .status {
   position: relative;
@@ -270,8 +279,6 @@ body[data-phase="idle"] #time, body[data-phase="idle"] #time .cs { color: var(--
 .status .line::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--faint); flex: none; }
 .status .line.now { color: var(--ink); font-weight: 500; }
 .status .line.now::before { background: color-mix(in oklab, var(--tone) 70%, white); box-shadow: 0 0 10px var(--tone); animation: breathe 2.4s ease-in-out infinite; }
-body[data-phase="rest"] .status .line.now { color: var(--warm); }
-body[data-phase="rest"] .status .line.now::before { background: var(--warm); box-shadow: 0 0 10px var(--warm); }
 .status .sub { font-family: var(--num); font-size: 12px; color: var(--dim); font-variant-numeric: tabular-nums; margin-top: 4px; padding-left: 13px; }
 
 .foot { position: relative; display: flex; flex-direction: column; gap: 14px; align-items: center; }
@@ -285,8 +292,11 @@ body[data-phase="rest"] .status .line.now::before { background: var(--warm); box
   -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
   box-shadow: var(--sheen);
 }
-#log span:last-child { animation: rise .5s var(--ease) both; }
-#log span b { font-weight: 400; color: var(--faint); margin-right: 5px; }
+#log span { display: inline-flex; align-items: baseline; gap: 5px; }
+#log em { font-style: normal; }
+#log b { font-weight: 400; font-size: 10px; letter-spacing: .06em; color: var(--faint); }
+#log .w { color: color-mix(in oklab, var(--red) 45%, var(--ink)); background: color-mix(in oklab, var(--red) 12%, var(--glass)); }
+#log .w b { color: color-mix(in oklab, var(--red) 60%, var(--faint)); }
 .hint { font-size: 12px; color: var(--faint); letter-spacing: .06em; transition: color .2s; }
 #pad[data-armed] .hint { color: var(--ink); }
 

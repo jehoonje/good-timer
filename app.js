@@ -229,7 +229,9 @@
 
   function openTimer(id) {
     const ex = findEx(id);
-    if (!s.ex || s.ex.id !== id) { s = fresh({ id: ex.id, name: ex.name, part: ex.part }); save(); }
+    if (!s.ex || s.ex.id !== id) { s = fresh({ id: ex.id, name: ex.name, part: ex.part }); }
+    if (s.phase === "idle") s.t0 = Date.now();   // set 1 clock starts when the timer opens
+    save();
     curPart = ex.part;
     setTone(ex.part);
     $("exName").textContent = ex.name;
@@ -274,7 +276,10 @@
 
   const hintFor = () => s.phase === "rest" ? "Double-tap to start the next set" : "Double-tap when the set is done";
   function renderStatus() {
-    if (view === "timer") document.body.dataset.phase = s.phase;
+    if (view === "timer") {
+      document.body.dataset.phase = s.phase;
+      document.body.style.setProperty("--tone", s.phase === "rest" ? "var(--mist)" : "var(--red)");
+    }
     let html = "";
     if (s.phase === "idle") {
       html = `<div class="line now">Set 1 in progress</div>`;
@@ -284,12 +289,12 @@
       $("setLabel").textContent = "BREAK " + s.set;
     } else {
       html = `<div class="line done">Set ${s.set - 1} complete</div><div class="line done" style="--i:1">Break complete</div>
-              <div class="line now" style="--i:2">Set ${s.set} in progress</div><div class="sub" id="setElapsed"></div>`;
+              <div class="line now" style="--i:2">Set ${s.set} in progress</div>`;
       $("setLabel").textContent = "SET " + s.set;
     }
     hintEl.textContent = hintFor();
     statusEl.innerHTML = html;
-    $("log").innerHTML = s.breaks.map(b => `<span><b>${b.n}</b>${fmt(b.duration_ms)}</span>`).join("");
+    renderLog();
     endBtn.disabled = s.phase === "idle";
     $("timerBack").hidden = s.phase !== "idle";
   }
@@ -298,14 +303,7 @@
   function frame() {
     const now = Date.now();
     if (view === "timer") {
-      let ms = 0;
-      if (s.phase === "rest") ms = now - s.t0;
-      else if (s.phase === "work") {
-        const last = s.breaks[s.breaks.length - 1];
-        ms = last ? last.duration_ms : 0;
-        const el = $("setElapsed");
-        if (el) el.textContent = "Set time " + fmtShort(now - s.t0);
-      }
+      const ms = s.t0 ? now - s.t0 : 0;
       const [a, b] = split(ms);
       if (mmEl.textContent !== a) mmEl.textContent = a;
       if (csEl.textContent !== b) csEl.textContent = b;
@@ -324,9 +322,11 @@
 
   function advance() {
     const now = Date.now();
+    const ghost = lift();
     if (s.phase === "idle") {
-      s.startedAt = now;
-      s.sets.push({ n: 1, started_at: null, ended_at: iso(now), duration_ms: null });
+      if (!s.t0) s.t0 = now;
+      s.startedAt = s.t0;
+      s.sets.push({ n: 1, started_at: iso(s.t0), ended_at: iso(now), duration_ms: now - s.t0 });
       s.phase = "rest"; s.t0 = now;
     } else if (s.phase === "work") {
       s.sets.push({ n: s.set, started_at: iso(s.t0), ended_at: iso(now), duration_ms: now - s.t0 });
@@ -337,6 +337,55 @@
     }
     try { navigator.vibrate && navigator.vibrate(25); } catch (e) {}
     keepAwake(); save(); renderStatus();
+    land(ghost);
+  }
+
+  /* ---------- Log + "number drops into the log" motion ---------- */
+  function renderLog() {
+    const items = [];
+    s.sets.forEach((st, i) => {
+      items.push(`<span class="w"><b>S${st.n}</b><em>${st.duration_ms == null ? "—" : fmt(st.duration_ms)}</em></span>`);
+      const br = s.breaks[i];
+      if (br) items.push(`<span class="r"><b>B${br.n}</b><em>${fmt(br.duration_ms)}</em></span>`);
+    });
+    $("log").innerHTML = items.join("");
+  }
+  // Freeze a copy of the big number where it sits, before the state changes.
+  function lift() {
+    if (view !== "timer" || reduced()) return null;
+    const t = $("time"), r = t.getBoundingClientRect();
+    const g = t.cloneNode(true);
+    g.removeAttribute("id"); g.querySelectorAll("[id]").forEach(n => n.removeAttribute("id"));
+    g.classList.add("ghost");
+    const cs = getComputedStyle(t), ccs = getComputedStyle($("cs"));
+    Object.assign(g.style, { left: r.left + "px", top: r.top + "px", color: cs.color, textShadow: cs.textShadow });
+    g.querySelector(".cs").style.color = ccs.color;
+    document.body.appendChild(g);
+    return { g, r };
+  }
+  // Fly the frozen copy into the newest log chip, then reveal the chip and fade the fresh clock in.
+  function land(ghost) {
+    const t = $("time");
+    if (!ghost) return;
+    const chip = $("log").lastElementChild;
+    t.animate([{ opacity: 0, transform: "translateY(10px) scale(.97)", filter: "blur(6px)" },
+               { opacity: 1, transform: "none", filter: "none" }],
+              { duration: 520, delay: 220, easing: "cubic-bezier(.2,.7,.1,1)", fill: "backwards" });
+    if (!chip) { ghost.g.remove(); return; }
+    const em = chip.querySelector("em");
+    chip.style.opacity = "0";
+    const to = em.getBoundingClientRect(), from = ghost.r;
+    const k = to.width / from.width;
+    const dx = to.left - from.left, dy = to.top + to.height / 2 - (from.top + from.height * k / 2);
+    const fly = ghost.g.animate([
+      { transform: "translate(0,0) scale(1)", opacity: 1, filter: "blur(0)" },
+      { transform: `translate(${dx * .55}px, ${dy * .5}px) scale(${(1 + k) / 2})`, opacity: .9, filter: "blur(.5px)", offset: .55 },
+      { transform: `translate(${dx}px, ${dy}px) scale(${k})`, opacity: 0, filter: "blur(1px)" }
+    ], { duration: 680, easing: "cubic-bezier(.55,0,.2,1)", fill: "forwards" });
+    chip.animate([{ opacity: 0, transform: "scale(.85)" }, { opacity: 1, transform: "scale(1.06)", offset: .6 }, { opacity: 1, transform: "scale(1)" }],
+                 { duration: 420, delay: 520, easing: "cubic-bezier(.2,.7,.1,1)", fill: "backwards" })
+      .finished.finally(() => { chip.style.opacity = ""; });
+    fly.finished.finally(() => ghost.g.remove());
   }
 
   const GAP = 380;
