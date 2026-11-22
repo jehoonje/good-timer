@@ -28,7 +28,6 @@
     <span class="eyebrow">GOOD TIMER</span>
     <button class="pill" data-history type="button">기록</button>
   </div>
-  <h1>오늘은 어디를<br>단련할까요</h1>
   <div id="resumeSlot"></div>
   <div class="parts" id="parts"></div>
 </section>
@@ -36,13 +35,12 @@
 <!-- Exercise list -->
 <section class="view" id="list" hidden>
   <div class="bar">
-    <button class="back" id="listBack" type="button"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 5 8l5 5"/></svg>부위 선택</button>
+    <button class="back icon" id="listBack" type="button" aria-label="부위 선택으로"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 5 8l5 5"/></svg></button>
   </div>
   <div class="list-head">
     <div class="fig" id="listFig"></div>
     <div>
       <h1 id="listTitle"></h1>
-      <div class="eyebrow" id="listSub"></div>
     </div>
   </div>
   <div class="exs" id="exs"></div>
@@ -56,7 +54,6 @@
         <button class="back icon" id="timerBack" type="button" aria-label="운동 목록으로"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 5 8l5 5"/></svg></button>
         <span class="ex-name" id="exName"></span>
       </div>
-      <span class="eyebrow" id="setLabel">SET 1</span>
     </div>
     <div class="actions">
       <button class="pill" id="endBtn" type="button">종료</button>
@@ -66,14 +63,14 @@
     <button class="start" id="startBtn" type="button" aria-label="1세트 시작">
       <span class="halo" aria-hidden="true"></span>
       <span class="rim" aria-hidden="true"></span>
-      <span class="face"><span class="lbl">START</span><small>SET 1</small></span>
+      <span class="face"><span class="lbl">START</span></span>
     </button>
     <div id="time"><span id="mm">0:00</span><span class="cs" id="cs">.00</span></div>
     <div class="status" id="status" aria-live="polite"></div>
   </div>
   <div class="foot" id="foot">
     <div id="log"></div>
-    <div class="hint" id="hint">세트가 끝나면 두 번 탭</div>
+    <div class="hint" id="hint"></div>
   </div>
 </section>
 
@@ -92,15 +89,14 @@
 </div>
 
 <div class="modal" id="endModal" hidden>
-  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="endTitle">
-    <div class="eyebrow" id="endTitle">FINISH</div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="endEx">
     <h2 id="endEx"></h2>
     <div class="summary" id="endSummary"></div>
     <div class="modal-actions">
-      <button class="pill quiet" id="discardBtn" type="button">저장 안 하고 종료</button>
+      <button class="pill quiet" id="discardBtn" type="button">저장 안 함</button>
       <button class="pill primary" id="saveBtn" type="button">저장</button>
     </div>
-    <button class="keep" id="keepBtn" type="button">계속하기</button>
+    <button class="keep" id="keepBtn" type="button">계속</button>
   </div>
 </div>
 

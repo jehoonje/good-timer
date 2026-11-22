@@ -188,7 +188,6 @@
         <div class="fig">${figure(k)}</div>
         <div class="label">
           <div class="name">${PARTS[k].name}</div>
-          <span class="count">${PARTS[k].en} · ${String(EX[k].length).padStart(2, "0")}</span>
         </div>
       </button>`).join("");
     renderResume();
@@ -200,16 +199,15 @@
     const slot = $("resumeSlot");
     if (!active()) { slot.innerHTML = ""; return; }
     const ex = findEx(s.ex.id);
-    const state = s.phase === "rest" ? `${s.set}세트 완료 · 브레이크 중` : `${s.set}세트 진행 중`;
     slot.innerHTML = `<button class="resume rise" type="button" id="resumeBtn" style="--tone:var(${PARTS[ex.part].tone})">
-      <span><i class="dot"></i><span><b>${ex.name}</b><small>${state}</small></span></span><span class="t" id="resumeT"></span></button>`;
+      <span><i class="dot"></i><b>${ex.name}</b></span><span class="t" id="resumeT"></span></button>`;
   }
 
   function lastFor(id) {
     const r = loadHistory().find(r => r.exercise_id === id);
     if (!r) return "";
     const d = new Date(r.started_at);
-    return `LAST ${d.getMonth() + 1}/${d.getDate()} · ${r.set_count} SETS`;
+    return `${d.getMonth() + 1}/${d.getDate()} · ${r.set_count}`;
   }
 
   function renderList(part) {
@@ -219,12 +217,11 @@
     $("listFig").innerHTML = figure(part);
     $("listFig").style.setProperty("--pt", `var(${P.tone})`);
     $("listTitle").textContent = P.name;
-    $("listSub").textContent = `${P.en} · ${EX[part].length} EXERCISES`;
     $("exs").innerHTML = EX[part].map(([id, name, en, eq, target], i) => `
       <button class="card ex rise${active() && s.ex.id === id ? " active" : ""}" type="button" data-ex="${id}" style="--pt:var(${P.tone});--i:${i}">
         <span class="glyph"><svg viewBox="0 0 24 24">${EQUIP[eq][1]}</svg></span>
-        <span><div class="en">${en}</div><div class="name">${name}</div><div class="tags">${EQUIP[eq][0]} · ${target}</div></span>
-        <span class="last">${active() && s.ex.id === id ? "IN PROGRESS" : lastFor(id)}</span>
+        <span class="name">${name}</span>
+        <span class="last">${active() && s.ex.id === id ? "●" : lastFor(id)}</span>
       </button>`).join("");
     show("list");
   }
@@ -251,7 +248,7 @@
     const x = e.target.closest("[data-ex]");
     if (x) {
       if (active() && s.ex.id !== x.dataset.ex) {
-        toast(`${s.ex.name}을(를) 먼저 종료해 주세요`);
+        toast("진행 중인 운동이 있어요");
         const r = $("resumeBtn"); if (r) { r.classList.remove("pulse"); void r.offsetWidth; r.classList.add("pulse"); }
         return;
       }
@@ -274,7 +271,7 @@
   /* ---------- Timer ---------- */
   const pad = $("pad"), statusEl = $("status"), hintEl = $("hint"), endBtn = $("endBtn");
 
-  const hintFor = () => s.phase === "rest" ? "다음 세트를 시작할 때 두 번 탭" : "세트가 끝나면 두 번 탭";
+  const hintFor = () => "";
   function renderStatus() {
     if (view === "timer") {
       document.body.dataset.phase = s.phase;
@@ -282,18 +279,13 @@
     }
     let html = "";
     if (s.phase === "idle") {
-      html = `<div class="line now">1세트 진행 중</div>`;
-      $("setLabel").textContent = "SET 1";
+      html = `<div class="line now">1세트</div>`;
     } else if (s.phase === "rest") {
-      html = `<div class="line done">${s.set}세트 완료</div><div class="line now" style="--i:1">${ordinal(s.set)} 브레이크 중</div>`;
-      $("setLabel").textContent = "BREAK " + s.set;
+      html = `<div class="line now">브레이크</div>`;
     } else if (s.set === 1) {
-      html = `<div class="line now">1세트 진행 중</div>`;
-      $("setLabel").textContent = "SET 1";
+      html = `<div class="line now">1세트</div>`;
     } else {
-      html = `<div class="line done">${s.set - 1}세트 완료</div><div class="line done" style="--i:1">브레이크 완료</div>
-              <div class="line now" style="--i:2">${s.set}세트 진행 중</div>`;
-      $("setLabel").textContent = "SET " + s.set;
+      html = `<div class="line now">${s.set}세트</div>`;
     }
     hintEl.textContent = hintFor();
     statusEl.innerHTML = html;
@@ -302,7 +294,7 @@
     const idle = s.phase === "idle";
     $("timerBack").hidden = !idle;
     $("startBtn").hidden = !idle;
-    [$("time"), statusEl, $("foot"), endBtn, $("setLabel")].forEach(el => el.hidden = idle);
+    [$("time"), statusEl, $("foot"), endBtn].forEach(el => el.hidden = idle);
   }
 
   /* ---------- 3D start button ---------- */
@@ -433,7 +425,7 @@
     if (now - lastTap < GAP) {
       lastTap = 0; delete pad.dataset.armed; clearTimeout(armT); advance();
     } else {
-      lastTap = now; pad.dataset.armed = ""; hintEl.textContent = "한 번 더 탭";
+      lastTap = now; pad.dataset.armed = ""; hintEl.textContent = "한 번 더";
       clearTimeout(armT);
       armT = setTimeout(() => { delete pad.dataset.armed; hintEl.textContent = hintFor(); }, GAP);
     }
@@ -501,7 +493,7 @@
     s = fresh(); save();
     closeEnd();
     go("back", () => renderList(ex.part));
-    toast(keep ? `저장했어요 · ${ex.name}` : "저장하지 않고 종료했어요");
+    toast(keep ? "저장됨" : "종료됨");
   }
   confirmable(endBtn, "종료", "한 번 더", openEnd);
   $("saveBtn").addEventListener("click", () => finish(true));
@@ -516,13 +508,12 @@
 
   function renderHist() {
     const h = loadHistory();
-    if (!h.length) { histEl.innerHTML = `<div class="empty">아직 저장된 기록이 없어요. 운동을 마치고 종료 → 저장을 누르면 여기에 쌓여요.</div>`; return; }
+    if (!h.length) { histEl.innerHTML = `<div class="empty">기록 없음</div>`; return; }
     histEl.innerHTML = h.map(r => `
       <div class="row">
-        <span class="when">${(findEx(r.exercise_id) || {}).name || r.exercise_name || "운동"}<small>${dateLabel(r.started_at)}${r.body_part && PARTS[r.body_part] ? " · " + PARTS[r.body_part].name : ""}</small></span>
-        <span class="meta">${r.set_count} SETS</span>
+        <span class="when">${(findEx(r.exercise_id) || {}).name || r.exercise_name || "운동"}<small>${dateLabel(r.started_at)}</small></span>
+        <span class="meta">${r.set_count}세트</span>
         <span class="meta">${fmtShort(r.duration_ms)}</span>
-        <span class="rests">${r.breaks.length ? "REST " + r.breaks.map(b => fmt(b.duration_ms)).join(" · ") : "휴식 기록 없음"}</span>
       </div>`).join("");
   }
   function openSheet() {

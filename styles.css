@@ -131,7 +131,7 @@ h1 {
   font-size: clamp(30px, 8.5vw, 46px); letter-spacing: -.015em; line-height: 1.12;
   margin: 30px 0 8px; text-wrap: balance;
 }
-#home h1 { margin-bottom: 24px; }
+#home .bar { margin-bottom: 22px; }
 
 /* entry motion for repeated items */
 @keyframes rise {
@@ -198,10 +198,11 @@ h1 {
   background: radial-gradient(closest-side, color-mix(in oklab, var(--pt) 35%, transparent), transparent);
 }
 .list-head .fig svg { position: relative; width: 100%; height: 100%; overflow: visible; }
-.list-head h1 { margin: 0 0 4px; }
+.list-head h1 { margin: 0; }
 #listFig { view-transition-name: hero-fig; }
 .exs { display: grid; grid-template-columns: repeat(auto-fill, minmax(152px, 1fr)); gap: 10px; }
-.ex { padding: 15px; display: flex; flex-direction: column; gap: 14px; min-width: 0; border-radius: 20px; }
+.ex { padding: 15px; display: flex; flex-direction: column; gap: 16px; min-width: 0; border-radius: 20px; }
+.ex .last:empty { display: none; }
 .ex .glyph {
   width: 38px; height: 38px; border-radius: 12px;
   display: flex; align-items: center; justify-content: center;
