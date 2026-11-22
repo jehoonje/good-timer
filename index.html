@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -13,7 +13,9 @@
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400&family=IBM+Plex+Sans+KR:wght@300;400;500&display=swap">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@200..500&family=Geist+Mono:wght@300..500&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -24,9 +26,9 @@
 <section class="view" id="home">
   <div class="bar">
     <span class="eyebrow">GOOD TIMER</span>
-    <button class="pill" data-history type="button">History</button>
+    <button class="pill" data-history type="button">기록</button>
   </div>
-  <h1>What are you training today?</h1>
+  <h1>오늘은 어디를<br>단련할까요</h1>
   <div id="resumeSlot"></div>
   <div class="parts" id="parts"></div>
 </section>
@@ -34,7 +36,7 @@
 <!-- Exercise list -->
 <section class="view" id="list" hidden>
   <div class="bar">
-    <button class="back" id="listBack" type="button"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 5 8l5 5"/></svg>Body parts</button>
+    <button class="back" id="listBack" type="button"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 5 8l5 5"/></svg>부위 선택</button>
   </div>
   <div class="list-head">
     <div class="fig" id="listFig"></div>
@@ -47,21 +49,21 @@
 </section>
 
 <!-- Timer -->
-<section class="view" id="pad" hidden role="button" tabindex="0" aria-label="Double-tap to switch between set and break">
+<section class="view" id="pad" hidden role="button" tabindex="0" aria-label="두 번 탭해서 세트와 브레이크 전환">
   <div class="bar">
     <div class="ex-title">
       <div class="ex-row">
-        <button class="back icon" id="timerBack" type="button" aria-label="Back to exercises"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 5 8l5 5"/></svg></button>
+        <button class="back icon" id="timerBack" type="button" aria-label="운동 목록으로"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 5 8l5 5"/></svg></button>
         <span class="ex-name" id="exName"></span>
       </div>
       <span class="eyebrow" id="setLabel">SET 1</span>
     </div>
     <div class="actions">
-      <button class="pill" id="endBtn" type="button">End</button>
+      <button class="pill" id="endBtn" type="button">종료</button>
     </div>
   </div>
   <div class="center">
-    <button class="start" id="startBtn" type="button" aria-label="Start set 1">
+    <button class="start" id="startBtn" type="button" aria-label="1세트 시작">
       <span class="halo" aria-hidden="true"></span>
       <span class="rim" aria-hidden="true"></span>
       <span class="face"><span class="lbl">START</span><small>SET 1</small></span>
@@ -71,34 +73,34 @@
   </div>
   <div class="foot" id="foot">
     <div id="log"></div>
-    <div class="hint" id="hint">Double-tap when the set is done</div>
+    <div class="hint" id="hint">세트가 끝나면 두 번 탭</div>
   </div>
 </section>
 
 <div class="sheet" id="sheet" hidden>
   <div class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
     <div class="sheet-head">
-      <h2 id="sheetTitle">History</h2>
-      <button class="pill" id="closeSheet" type="button">Close</button>
+      <h2 id="sheetTitle">기록</h2>
+      <button class="pill" id="closeSheet" type="button">닫기</button>
     </div>
     <div class="list" id="hist"></div>
     <div class="note" id="syncNote" hidden></div>
     <div class="sheet-actions">
-      <button class="pill" id="clearBtn" type="button">Clear all</button>
+      <button class="pill" id="clearBtn" type="button">전체 삭제</button>
     </div>
   </div>
 </div>
 
 <div class="modal" id="endModal" hidden>
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="endTitle">
-    <div class="eyebrow" id="endTitle">FINISH EXERCISE</div>
+    <div class="eyebrow" id="endTitle">FINISH</div>
     <h2 id="endEx"></h2>
     <div class="summary" id="endSummary"></div>
     <div class="modal-actions">
-      <button class="pill quiet" id="discardBtn" type="button">End without saving</button>
-      <button class="pill primary" id="saveBtn" type="button">Save</button>
+      <button class="pill quiet" id="discardBtn" type="button">저장 안 하고 종료</button>
+      <button class="pill primary" id="saveBtn" type="button">저장</button>
     </div>
-    <button class="keep" id="keepBtn" type="button">Keep going</button>
+    <button class="keep" id="keepBtn" type="button">계속하기</button>
   </div>
 </div>
 
