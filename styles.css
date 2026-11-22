@@ -16,12 +16,12 @@
   --skin: rgba(232, 238, 235, .045);
   --cool: #4f8f95;
   --warm: #d0915f;
-  --red: #e4574d;
-  --mist: #9aa4a6;
-  --t-back: #5ba3a8;
-  --t-chest: #d68d63;
-  --t-shoulder: #9d93cf;
-  --t-legs: #9db063;
+  --red: #c97a70;
+  --mist: #8e9a9d;
+  --t-back: #78a3a6;
+  --t-chest: #c4917c;
+  --t-shoulder: #9c98bd;
+  --t-legs: #a2ab80;
   --num: "Sora", "IBM Plex Sans KR", system-ui, sans-serif;
   --text: "IBM Plex Sans KR", "Apple SD Gothic Neo", system-ui, sans-serif;
   --ease: cubic-bezier(.2, .7, .1, 1);
@@ -63,7 +63,7 @@ button { font: inherit; color: inherit; border: 0; }
   width: 40vmax; height: 40vmax; left: 20vw; bottom: -22vmax; opacity: .45; animation-duration: 34s; animation-delay: -15s;
   background: radial-gradient(closest-side, color-mix(in oklab, var(--tone) 40%, #7a8cff 30%), transparent);
 }
-body[data-phase="work"] .glow, body[data-phase="idle"] .glow { opacity: .7; }
+body[data-phase="work"] .glow, body[data-phase="idle"] .glow { opacity: .48; }
 body[data-phase="rest"] .glow { opacity: .32; }
 body[data-phase="rest"] .glow i { animation-duration: 11s; }
 @keyframes float {
@@ -110,7 +110,7 @@ body[data-phase="rest"] .glow i { animation-duration: 11s; }
   box-shadow: var(--sheen);
 }
 .pill:active { transform: scale(.95); }
-.pill[data-armed] { color: #1a120c; background: var(--warm); }
+.pill[data-armed] { color: var(--ink); background: color-mix(in oklab, var(--red) 30%, var(--glass-2)); }
 .pill:disabled { opacity: .3; cursor: default; }
 .back {
   display: inline-flex; align-items: center; gap: 6px;
@@ -183,7 +183,7 @@ h1 {
 /* ---------- Anatomy figure ---------- */
 .figure .sk { fill: var(--skin); }
 .figure .m { fill: var(--muscle); transition: fill .6s ease; }
-.figure .hl { fill: var(--pt); fill-opacity: .85; filter: drop-shadow(0 0 5px color-mix(in oklab, var(--pt) 80%, transparent)); }
+.figure .hl { fill: var(--pt); fill-opacity: .7; filter: drop-shadow(0 0 6px color-mix(in oklab, var(--pt) 60%, transparent)); }
 .figure .fib { stroke: var(--ground); stroke-opacity: .55; stroke-width: .5; fill: none; }
 .figure .hl-fib { stroke: rgba(255, 255, 255, .35); stroke-width: .45; fill: none; }
 .card:hover .figure .hl, .list-head .figure .hl { animation: pulseMuscle 3.2s ease-in-out infinite; }
@@ -259,58 +259,80 @@ h1 {
   transition: color .8s ease, text-shadow .8s ease;
 }
 #time .cs { font-size: .44em; color: var(--dim); margin-left: .04em; }
-body:is([data-phase="work"], [data-phase="idle"]) #time { color: color-mix(in oklab, var(--red) 22%, var(--ink)); text-shadow: 0 0 44px color-mix(in oklab, var(--red) 40%, transparent); }
-body:is([data-phase="work"], [data-phase="idle"]) #time .cs { color: color-mix(in oklab, var(--red) 55%, var(--dim)); }
+body:is([data-phase="work"], [data-phase="idle"]) #time { color: color-mix(in oklab, var(--red) 14%, var(--ink)); text-shadow: 0 0 48px color-mix(in oklab, var(--red) 26%, transparent); }
+body:is([data-phase="work"], [data-phase="idle"]) #time .cs { color: color-mix(in oklab, var(--red) 45%, var(--dim)); }
 body[data-phase="rest"] #time { color: var(--ink); text-shadow: none; }
 body[data-phase="rest"] #time .cs { color: var(--dim); }
-/* 3D start button: a glossy red cap riding on a darker rim; pressing sinks the cap onto the rim. */
+/* 3D start button: a smoked-glass puck on a dark base, lit from inside by a soft ember ring.
+   Pressing sinks the puck onto its base and dims the core. */
 .start {
-  --d: 12px;
+  --d: 10px;
   position: relative; display: block;
-  width: min(54vw, 210px); aspect-ratio: 1; max-width: 100%;
+  width: min(52vw, 204px); aspect-ratio: 1; max-width: 100%;
   padding: 0; margin-bottom: var(--d);
   background: none; border-radius: 50%; cursor: pointer;
   -webkit-tap-highlight-color: transparent; touch-action: manipulation;
-  animation: appear .7s var(--ease) both .15s;
+  animation: appear .8s var(--ease) both .15s;
 }
 .start .halo {
-  position: absolute; inset: -18%; border-radius: 50%;
-  background: radial-gradient(closest-side, color-mix(in oklab, var(--red) 34%, transparent), transparent 72%);
-  animation: halo 3.2s ease-in-out infinite;
+  position: absolute; inset: -26%; border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in oklab, var(--red) 20%, transparent), transparent 70%);
+  animation: halo 4.2s ease-in-out infinite;
 }
 .start .halo::after {
-  content: ""; position: absolute; inset: 16%; border-radius: 50%;
-  box-shadow: 0 0 0 1px color-mix(in oklab, var(--red) 40%, transparent);
-  animation: ripple 3.2s ease-out infinite;
+  content: ""; position: absolute; inset: 21%; border-radius: 50%;
+  box-shadow: 0 0 0 .5px color-mix(in oklab, var(--red) 35%, transparent), 0 0 18px color-mix(in oklab, var(--red) 18%, transparent);
+  animation: ripple 4.2s ease-out infinite;
 }
 .start .rim {
   position: absolute; inset: 0; border-radius: 50%;
   transform: translateY(var(--d));
-  background: linear-gradient(180deg, #a3332b, #4c1411 85%);
-  box-shadow: 0 26px 50px -14px rgba(0, 0, 0, .8), 0 18px 60px -20px color-mix(in oklab, var(--red) 70%, transparent);
+  background: linear-gradient(180deg, #2a2224 0%, #120f10 70%);
+  box-shadow: 0 30px 50px -18px rgba(0, 0, 0, .85), 0 16px 50px -22px color-mix(in oklab, var(--red) 45%, transparent),
+              inset 0 -1px 0 color-mix(in oklab, var(--red) 25%, transparent);
 }
 .start .face {
-  position: absolute; inset: 0; border-radius: 50%;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  position: absolute; inset: 0; border-radius: 50%; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
   background:
-    radial-gradient(60% 45% at 38% 26%, rgba(255, 255, 255, .42), transparent 70%),
-    radial-gradient(circle at 50% 40%, #f0746a, #d9473e 55%, #a9322a 100%);
-  box-shadow: inset 0 2px 1px rgba(255, 255, 255, .35), inset 0 -10px 22px rgba(70, 10, 6, .45), 0 1px 0 rgba(0, 0, 0, .25);
-  color: #fff6f4;
-  transition: transform .16s cubic-bezier(.3, 1.6, .5, 1), box-shadow .16s ease, filter .16s ease;
+    radial-gradient(70% 40% at 50% 8%, rgba(255, 255, 255, .14), transparent 70%),
+    radial-gradient(circle at 50% 55%, color-mix(in oklab, var(--red) 26%, transparent), transparent 62%),
+    linear-gradient(180deg, rgba(48, 40, 42, .92), rgba(22, 19, 20, .96));
+  -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12), inset 0 -14px 26px rgba(0, 0, 0, .45);
+  color: var(--ink);
+  transition: transform .18s cubic-bezier(.3, 1.6, .5, 1), box-shadow .18s ease, filter .18s ease;
 }
-.start .lbl { font-family: var(--num); font-weight: 400; font-size: clamp(20px, 6vw, 26px); letter-spacing: .22em; padding-left: .22em; text-shadow: 0 1px 2px rgba(90, 15, 10, .5); }
-.start small { font-size: 10px; letter-spacing: .24em; padding-left: .24em; opacity: .75; }
+.start .face::before {
+  content: ""; position: absolute; inset: 13%; border-radius: 50%;
+  box-shadow: inset 0 0 0 .75px color-mix(in oklab, var(--red) 55%, transparent),
+              inset 0 0 22px color-mix(in oklab, var(--red) 30%, transparent),
+              0 0 22px color-mix(in oklab, var(--red) 24%, transparent);
+  transition: opacity .18s ease;
+}
+.start .face::after {
+  content: ""; position: absolute; inset: 0; border-radius: 50%;
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .025) 0 1px, transparent 1px 4px);
+  mix-blend-mode: overlay; pointer-events: none;
+}
+.start .lbl {
+  position: relative;
+  font-family: var(--num); font-weight: 300; font-size: clamp(18px, 5.4vw, 22px);
+  letter-spacing: .34em; padding-left: .34em;
+  text-shadow: 0 0 14px color-mix(in oklab, var(--red) 55%, transparent);
+}
+.start small { position: relative; font-family: var(--num); font-size: 9px; letter-spacing: .3em; padding-left: .3em; color: color-mix(in oklab, var(--red) 55%, var(--dim)); }
 .start.pressed .face {
-  transform: translateY(calc(var(--d) - 3px)) scale(.985);
-  box-shadow: inset 0 3px 8px rgba(70, 10, 6, .55), inset 0 -2px 6px rgba(255, 255, 255, .08);
-  filter: brightness(.94);
+  transform: translateY(calc(var(--d) - 2px)) scale(.985);
+  box-shadow: inset 0 4px 14px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .05);
+  filter: brightness(.85);
   transition-duration: .07s;
 }
-.start.pressed .halo { animation-play-state: paused; opacity: .5; }
-.start.launch { animation: launch .46s var(--ease) forwards; pointer-events: none; }
+.start.pressed .face::before { opacity: .55; }
+.start.pressed .halo { animation-play-state: paused; opacity: .4; }
+.start.launch { animation: launch .5s var(--ease) forwards; pointer-events: none; }
 .start:focus-visible { outline: none; }
-.start:focus-visible .face { box-shadow: 0 0 0 3px var(--ink), inset 0 2px 1px rgba(255, 255, 255, .35); }
+.start:focus-visible .face { box-shadow: 0 0 0 2px var(--ink), inset 0 1px 0 rgba(255, 255, 255, .12); }
 @keyframes appear { from { opacity: 0; transform: scale(.8) translateY(14px); filter: blur(8px); } }
 @keyframes launch { to { opacity: 0; transform: scale(.82); filter: blur(12px); } }
 @keyframes halo { 50% { transform: scale(1.06); opacity: .75; } }
@@ -348,7 +370,7 @@ body[data-phase="rest"] #time .cs { color: var(--dim); }
 #log span { display: inline-flex; align-items: baseline; gap: 5px; }
 #log em { font-style: normal; }
 #log b { font-weight: 400; font-size: 10px; letter-spacing: .06em; color: var(--faint); }
-#log .w { color: color-mix(in oklab, var(--red) 45%, var(--ink)); background: color-mix(in oklab, var(--red) 12%, var(--glass)); }
+#log .w { color: color-mix(in oklab, var(--red) 35%, var(--ink)); background: color-mix(in oklab, var(--red) 8%, var(--glass)); }
 #log .w b { color: color-mix(in oklab, var(--red) 60%, var(--faint)); }
 .hint { font-size: 12px; color: var(--faint); letter-spacing: .06em; transition: color .2s; }
 #pad[data-armed] .hint { color: var(--ink); }
@@ -419,7 +441,7 @@ body[data-phase="rest"] #time .cs { color: var(--dim); }
 .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
 .modal-actions .pill { padding: 14px 12px; font-size: 14px; white-space: normal; text-align: center; }
 .pill.quiet { background: var(--glass); color: var(--dim); }
-.pill.primary { background: color-mix(in oklab, var(--tone) 70%, white 8%); color: #0b1010; font-weight: 500; }
+.pill.primary { background: color-mix(in oklab, var(--tone) 26%, var(--glass-2)); color: var(--ink); font-weight: 500; box-shadow: var(--sheen), 0 0 24px -6px color-mix(in oklab, var(--tone) 50%, transparent); }
 .keep { background: none; color: var(--dim); font-size: 13px; padding: 8px; cursor: pointer; }
 .keep:focus-visible { outline: 2px solid var(--ink); border-radius: 8px; }
 
