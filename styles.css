@@ -22,9 +22,8 @@
   --t-chest: #c4917c;
   --t-shoulder: #9c98bd;
   --t-legs: #a2ab80;
-  --num: "Geist", "Pretendard Variable", Pretendard, -apple-system, system-ui, sans-serif;
-  --text: "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", system-ui, sans-serif;
-  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --num: "Sora", "IBM Plex Sans KR", system-ui, sans-serif;
+  --text: "IBM Plex Sans KR", "Apple SD Gothic Neo", system-ui, sans-serif;
   --ease: cubic-bezier(.2, .7, .1, 1);
   --top: max(14px, calc(env(safe-area-inset-top, 0px) + 6px));
   --bottom: max(20px, calc(env(safe-area-inset-bottom, 0px) + 10px));
@@ -101,7 +100,7 @@ body[data-phase="rest"] .glow i { animation-duration: 11s; }
   display: flex; justify-content: space-between; align-items: center; gap: 10px;
   min-height: 40px;
 }
-.eyebrow { font-family: var(--mono); font-size: 10.5px; letter-spacing: .16em; color: var(--dim); }
+.eyebrow { font-size: 11px; letter-spacing: .18em; color: var(--dim); }
 .pill {
   font-size: 12px; letter-spacing: .04em;
   color: var(--ink); background: var(--glass-2);
@@ -127,47 +126,11 @@ body[data-phase="rest"] .glow i { animation-duration: 11s; }
 :is(.pill, .back, .card, .resume):focus-visible { outline: 2px solid color-mix(in oklab, var(--tone) 70%, white); outline-offset: 2px; }
 
 h1 {
-  font-family: var(--num); font-weight: 250;
+  font-family: var(--num); font-weight: 200;
   font-size: clamp(30px, 8.5vw, 46px); letter-spacing: -.015em; line-height: 1.12;
   margin: 30px 0 8px; text-wrap: balance;
 }
-#home .bar { margin-bottom: 6px; }
-
-/* ---------- Today HUD ---------- */
-.dots {
-  position: fixed; inset: 0; pointer-events: none;
-  background-image: radial-gradient(rgba(255, 255, 255, .07) .8px, transparent 1.2px);
-  background-size: 22px 22px;
-  -webkit-mask-image: radial-gradient(75% 60% at 50% 40%, black, transparent);
-  mask-image: radial-gradient(75% 60% at 50% 40%, black, transparent);
-}
-.today { display: flex; flex-direction: column; gap: 14px; margin: 14px 0 18px; animation: rise .7s var(--ease) both; }
-.today-top { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.date { display: flex; align-items: baseline; gap: 10px; }
-.dnum { font-family: var(--num); font-weight: 200; font-size: clamp(46px, 14vw, 68px); letter-spacing: -.04em; line-height: .9; font-variant-numeric: tabular-nums; }
-.dday { font-family: var(--mono); font-size: 10.5px; letter-spacing: .18em; color: var(--dim); }
-.stats { display: flex; gap: 18px; padding-bottom: 2px; }
-.stats div { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
-.stats small, .summary small { font-family: var(--mono); font-size: 9px; letter-spacing: .16em; color: var(--faint); }
-.stats span { font-family: var(--num); font-weight: 300; font-size: 19px; font-variant-numeric: tabular-nums; }
-.week {
-  display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px;
-  padding: 12px 10px 10px; border-radius: 20px;
-  background: var(--glass);
-  -webkit-backdrop-filter: blur(22px) saturate(150%); backdrop-filter: blur(22px) saturate(150%);
-  box-shadow: var(--sheen), var(--lift);
-}
-.day { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.day i {
-  display: flex; flex-direction: column-reverse; gap: 3px;
-  width: 100%; max-width: 24px; height: 30px; padding: 3px; box-sizing: border-box;
-  border-radius: 8px; background: rgba(255, 255, 255, .03);
-}
-.day b { display: block; height: 5px; border-radius: 3px; background: var(--pt); box-shadow: 0 0 8px color-mix(in oklab, var(--pt) 70%, transparent); opacity: .85; }
-.day span { font-family: var(--mono); font-size: 9.5px; letter-spacing: .1em; color: var(--faint); }
-.day.is-today i { background: rgba(255, 255, 255, .08); }
-.day.is-today span { color: var(--ink); }
-.day.future { opacity: .4; }
+#home h1 { margin-bottom: 24px; }
 
 /* entry motion for repeated items */
 @keyframes rise {
@@ -212,11 +175,10 @@ h1 {
   display: flex; align-items: center; justify-content: center;
 }
 .part .fig svg { height: 100%; width: auto; overflow: visible; }
-.part .label { position: relative; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 0 4px; }
-.part .pmeta { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; color: var(--dim); }
-.part .name { font-size: 19px; font-weight: 600; letter-spacing: -.01em; }
+.part .label { position: relative; display: flex; flex-direction: column; gap: 3px; padding: 0 4px; }
+.part .name { font-size: 18px; font-weight: 500; }
 .part .meta { font-size: 10px; letter-spacing: .16em; color: var(--pt); margin-top: 2px; }
-.part .count { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; color: var(--dim); }
+.part .count { font-family: var(--num); font-size: 12px; color: var(--dim); font-variant-numeric: tabular-nums; }
 
 /* ---------- Anatomy figure ---------- */
 .figure .sk { fill: var(--skin); }
@@ -235,14 +197,10 @@ h1 {
   background: radial-gradient(closest-side, color-mix(in oklab, var(--pt) 35%, transparent), transparent);
 }
 .list-head .fig svg { position: relative; width: 100%; height: 100%; overflow: visible; }
-.list-head h1 { margin: 0; }
+.list-head h1 { margin: 0 0 4px; }
 #listFig { view-transition-name: hero-fig; }
 .exs { display: grid; grid-template-columns: repeat(auto-fill, minmax(152px, 1fr)); gap: 10px; }
-.ex { padding: 15px; display: flex; flex-direction: column; gap: 16px; min-width: 0; border-radius: 20px; }
-.ex .last:empty { display: none; }
-.ex-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-.ex .eq { font-family: var(--mono); font-size: 9px; letter-spacing: .14em; color: var(--faint); padding-top: 2px; }
-#listMeta { margin-top: 8px; }
+.ex { padding: 15px; display: flex; flex-direction: column; gap: 14px; min-width: 0; border-radius: 20px; }
 .ex .glyph {
   width: 38px; height: 38px; border-radius: 12px;
   display: flex; align-items: center; justify-content: center;
@@ -251,10 +209,9 @@ h1 {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 6px 18px -8px var(--pt);
 }
 .ex .glyph svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-.ex .en { font-family: var(--mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: color-mix(in oklab, var(--pt) 70%, var(--dim)); margin-bottom: 4px; }
-.ex .name { font-size: 15px; font-weight: 600; line-height: 1.35; letter-spacing: -.01em; }
+.ex .name { font-size: 15px; font-weight: 500; line-height: 1.35; }
 .ex .tags { font-size: 12px; color: var(--dim); margin-top: 3px; }
-.ex .last { font-family: var(--mono); letter-spacing: .06em; font-size: 11px; color: var(--faint); font-variant-numeric: tabular-nums; }
+.ex .last { font-family: var(--num); font-size: 11px; color: var(--faint); font-variant-numeric: tabular-nums; }
 .ex.active { background: color-mix(in oklab, var(--warm) 16%, var(--glass)); }
 .ex.active .last { color: var(--warm); }
 
@@ -293,9 +250,6 @@ h1 {
   gap: clamp(14px, 4vw, 34px);
   min-width: 0; min-height: 0;
 }
-.readout { position: relative; display: flex; flex-direction: column; gap: 10px; }
-.readout .meta { font-family: var(--mono); font-size: 10.5px; letter-spacing: .16em; color: var(--dim); min-height: 1.2em; font-variant-numeric: tabular-nums; padding-left: .3em; }
-body:is([data-phase="work"]) #metaTop { color: color-mix(in oklab, var(--red) 50%, var(--dim)); }
 #time {
   position: relative;
   font-family: var(--num); font-weight: 200;
@@ -367,7 +321,7 @@ body[data-phase="rest"] #time .cs { color: var(--dim); }
   letter-spacing: .34em; padding-left: .34em;
   text-shadow: 0 0 14px color-mix(in oklab, var(--red) 55%, transparent);
 }
-.start small { position: relative; font-family: var(--mono); font-size: 9px; letter-spacing: .3em; padding-left: .3em; color: color-mix(in oklab, var(--red) 55%, var(--dim)); }
+.start small { position: relative; font-family: var(--num); font-size: 9px; letter-spacing: .3em; padding-left: .3em; color: color-mix(in oklab, var(--red) 55%, var(--dim)); }
 .start.pressed .face {
   transform: translateY(calc(var(--d) - 2px)) scale(.985);
   box-shadow: inset 0 4px 14px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .05);
@@ -415,7 +369,7 @@ body[data-phase="rest"] #time .cs { color: var(--dim); }
 }
 #log span { display: inline-flex; align-items: baseline; gap: 5px; }
 #log em { font-style: normal; }
-#log b { font-family: var(--mono); font-weight: 400; font-size: 10px; letter-spacing: .06em; color: var(--faint); }
+#log b { font-weight: 400; font-size: 10px; letter-spacing: .06em; color: var(--faint); }
 #log .w { color: color-mix(in oklab, var(--red) 35%, var(--ink)); background: color-mix(in oklab, var(--red) 8%, var(--glass)); }
 #log .w b { color: color-mix(in oklab, var(--red) 60%, var(--faint)); }
 .hint { font-size: 12px; color: var(--faint); letter-spacing: .06em; transition: color .2s; }
@@ -448,7 +402,7 @@ body[data-phase="rest"] #time .cs { color: var(--dim); }
 .sheet-head h2 { margin: 0; font-size: 16px; font-weight: 500; }
 .summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .summary div { display: flex; flex-direction: column; gap: 4px; padding: 12px; border-radius: 16px; background: var(--glass); }
-.summary small { font-family: var(--mono); font-size: 10px; color: var(--dim); letter-spacing: .14em; }
+.summary small { font-size: 10px; color: var(--dim); letter-spacing: .14em; }
 .summary span { font-family: var(--num); font-weight: 300; font-size: 22px; font-variant-numeric: tabular-nums; }
 .list { overflow-y: auto; display: flex; flex-direction: column; gap: 6px; min-height: 0; }
 .row {

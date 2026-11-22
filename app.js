@@ -1,72 +1,72 @@
 (() => {
   /* ---------- Data ---------- */
   const PARTS = {
-    back:     { name: "등",   en: "BACK",      tone: "--t-back",     view: "back" },
-    chest:    { name: "가슴", en: "CHEST",     tone: "--t-chest",    view: "front" },
-    shoulder: { name: "어깨", en: "SHOULDERS", tone: "--t-shoulder", view: "front" },
-    legs:     { name: "하체", en: "LEGS",      tone: "--t-legs",     view: "front" }
+    back:     { name: "Back",      tone: "--t-back",     view: "back" },
+    chest:    { name: "Chest",     tone: "--t-chest",    view: "front" },
+    shoulder: { name: "Shoulders", tone: "--t-shoulder", view: "front" },
+    legs:     { name: "Legs",      tone: "--t-legs",     view: "front" }
   };
-  // [id, 이름, English, 장비, 주 타깃]
+  // [id, name, equipment, primary target]
   const EX = {
     back: [
-      ["deadlift", "데드리프트", "Deadlift", "barbell", "척추기립근 · 둔근"],
-      ["pull-up", "풀업", "Pull-up", "body", "광배근"],
-      ["lat-pulldown", "랫풀다운", "Lat Pulldown", "cable", "광배근"],
-      ["barbell-row", "바벨 로우", "Barbell Row", "barbell", "광배 · 능형근"],
-      ["one-arm-db-row", "원암 덤벨 로우", "One-Arm DB Row", "dumbbell", "광배근"],
-      ["seated-cable-row", "시티드 케이블 로우", "Seated Cable Row", "cable", "중부 등"],
-      ["t-bar-row", "T바 로우", "T-Bar Row", "barbell", "중부 등"],
-      ["straight-arm-pulldown", "스트레이트 암 풀다운", "Straight-Arm Pulldown", "cable", "광배근"],
-      ["hyperextension", "백 익스텐션", "Back Extension", "body", "척추기립근"],
-      ["shrug", "슈러그", "Shrug", "dumbbell", "승모근"]
+      ["deadlift", "Deadlift", "barbell", "Lower back · Glutes"],
+      ["pull-up", "Pull-up", "body", "Lats"],
+      ["lat-pulldown", "Lat Pulldown", "cable", "Lats"],
+      ["barbell-row", "Barbell Row", "barbell", "Lats · Rhomboids"],
+      ["one-arm-db-row", "One-Arm Dumbbell Row", "dumbbell", "Lats"],
+      ["seated-cable-row", "Seated Cable Row", "cable", "Mid back"],
+      ["t-bar-row", "T-Bar Row", "barbell", "Mid back"],
+      ["straight-arm-pulldown", "Straight-Arm Pulldown", "cable", "Lats"],
+      ["hyperextension", "Back Extension", "body", "Lower back"],
+      ["shrug", "Shrug", "dumbbell", "Traps"]
     ],
     chest: [
-      ["bench-press", "벤치프레스", "Bench Press", "barbell", "대흉근"],
-      ["incline-bench", "인클라인 벤치프레스", "Incline Bench", "barbell", "윗가슴"],
-      ["decline-bench", "디클라인 벤치프레스", "Decline Bench", "barbell", "아랫가슴"],
-      ["db-press", "덤벨 프레스", "Dumbbell Press", "dumbbell", "대흉근"],
-      ["incline-db-press", "인클라인 덤벨 프레스", "Incline DB Press", "dumbbell", "윗가슴"],
-      ["db-fly", "덤벨 플라이", "Dumbbell Fly", "dumbbell", "가슴 안쪽"],
-      ["cable-crossover", "케이블 크로스오버", "Cable Crossover", "cable", "가슴 안쪽"],
-      ["chest-press", "체스트 프레스 머신", "Chest Press", "machine", "대흉근"],
-      ["pec-deck", "펙덱 플라이", "Pec Deck", "machine", "가슴 안쪽"],
-      ["dips", "딥스", "Dips", "body", "아랫가슴 · 삼두"],
-      ["push-up", "푸시업", "Push-up", "body", "대흉근"]
+      ["bench-press", "Bench Press", "barbell", "Pecs"],
+      ["incline-bench", "Incline Bench Press", "barbell", "Upper chest"],
+      ["decline-bench", "Decline Bench Press", "barbell", "Lower chest"],
+      ["db-press", "Dumbbell Press", "dumbbell", "Pecs"],
+      ["incline-db-press", "Incline Dumbbell Press", "dumbbell", "Upper chest"],
+      ["db-fly", "Dumbbell Fly", "dumbbell", "Inner chest"],
+      ["cable-crossover", "Cable Crossover", "cable", "Inner chest"],
+      ["chest-press", "Machine Chest Press", "machine", "Pecs"],
+      ["pec-deck", "Pec Deck", "machine", "Inner chest"],
+      ["dips", "Dips", "body", "Lower chest · Triceps"],
+      ["push-up", "Push-up", "body", "Pecs"]
     ],
     shoulder: [
-      ["ohp", "오버헤드 프레스", "Overhead Press", "barbell", "전면 · 측면 삼각근"],
-      ["db-shoulder-press", "덤벨 숄더 프레스", "DB Shoulder Press", "dumbbell", "전면 삼각근"],
-      ["arnold-press", "아놀드 프레스", "Arnold Press", "dumbbell", "삼각근 전체"],
-      ["machine-shoulder-press", "머신 숄더 프레스", "Machine Shoulder Press", "machine", "전면 삼각근"],
-      ["lateral-raise", "사이드 레터럴 레이즈", "Lateral Raise", "dumbbell", "측면 삼각근"],
-      ["cable-lateral-raise", "케이블 레터럴 레이즈", "Cable Lateral Raise", "cable", "측면 삼각근"],
-      ["front-raise", "프론트 레이즈", "Front Raise", "dumbbell", "전면 삼각근"],
-      ["rear-delt-fly", "리어 델트 플라이", "Rear Delt Fly", "dumbbell", "후면 삼각근"],
-      ["face-pull", "페이스 풀", "Face Pull", "cable", "후면 삼각근"],
-      ["upright-row", "업라이트 로우", "Upright Row", "barbell", "측면 삼각근 · 승모"]
+      ["ohp", "Overhead Press", "barbell", "Front · Side delts"],
+      ["db-shoulder-press", "Dumbbell Shoulder Press", "dumbbell", "Front delts"],
+      ["arnold-press", "Arnold Press", "dumbbell", "All delts"],
+      ["machine-shoulder-press", "Machine Shoulder Press", "machine", "Front delts"],
+      ["lateral-raise", "Lateral Raise", "dumbbell", "Side delts"],
+      ["cable-lateral-raise", "Cable Lateral Raise", "cable", "Side delts"],
+      ["front-raise", "Front Raise", "dumbbell", "Front delts"],
+      ["rear-delt-fly", "Rear Delt Fly", "dumbbell", "Rear delts"],
+      ["face-pull", "Face Pull", "cable", "Rear delts"],
+      ["upright-row", "Upright Row", "barbell", "Side delts · Traps"]
     ],
     legs: [
-      ["back-squat", "백 스쿼트", "Back Squat", "barbell", "대퇴사두 · 둔근"],
-      ["front-squat", "프론트 스쿼트", "Front Squat", "barbell", "대퇴사두"],
-      ["leg-press", "레그 프레스", "Leg Press", "machine", "대퇴사두"],
-      ["hack-squat", "핵 스쿼트", "Hack Squat", "machine", "대퇴사두"],
-      ["rdl", "루마니안 데드리프트", "Romanian Deadlift", "barbell", "햄스트링 · 둔근"],
-      ["lunge", "런지", "Lunge", "dumbbell", "대퇴사두 · 둔근"],
-      ["bulgarian-split-squat", "불가리안 스플릿 스쿼트", "Bulgarian Split Squat", "dumbbell", "대퇴사두 · 둔근"],
-      ["leg-extension", "레그 익스텐션", "Leg Extension", "machine", "대퇴사두"],
-      ["leg-curl", "레그 컬", "Leg Curl", "machine", "햄스트링"],
-      ["hip-thrust", "힙 쓰러스트", "Hip Thrust", "barbell", "둔근"],
-      ["calf-raise", "카프 레이즈", "Calf Raise", "machine", "종아리"]
+      ["back-squat", "Back Squat", "barbell", "Quads · Glutes"],
+      ["front-squat", "Front Squat", "barbell", "Quads"],
+      ["leg-press", "Leg Press", "machine", "Quads"],
+      ["hack-squat", "Hack Squat", "machine", "Quads"],
+      ["rdl", "Romanian Deadlift", "barbell", "Hamstrings · Glutes"],
+      ["lunge", "Lunge", "dumbbell", "Quads · Glutes"],
+      ["bulgarian-split-squat", "Bulgarian Split Squat", "dumbbell", "Quads · Glutes"],
+      ["leg-extension", "Leg Extension", "machine", "Quads"],
+      ["leg-curl", "Leg Curl", "machine", "Hamstrings"],
+      ["hip-thrust", "Hip Thrust", "barbell", "Glutes"],
+      ["calf-raise", "Calf Raise", "machine", "Calves"]
     ]
   };
   const EQUIP = {
-    barbell: ["바벨", '<path d="M2 12h20"/><rect x="4" y="7" width="3" height="10" rx="1"/><rect x="17" y="7" width="3" height="10" rx="1"/>'],
-    dumbbell: ["덤벨", '<path d="M8 12h8"/><rect x="4" y="8" width="4" height="8" rx="1.5"/><rect x="16" y="8" width="4" height="8" rx="1.5"/>'],
-    cable: ["케이블", '<circle cx="12" cy="5" r="2.5"/><path d="M12 7.5V17"/><path d="M8 19h8"/>'],
-    machine: ["머신", '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h6"/>'],
-    body: ["맨몸", '<circle cx="12" cy="5" r="2.2"/><path d="M12 8v7M8 11h8M12 15l-3 5M12 15l3 5"/>']
+    barbell: ["Barbell", '<path d="M2 12h20"/><rect x="4" y="7" width="3" height="10" rx="1"/><rect x="17" y="7" width="3" height="10" rx="1"/>'],
+    dumbbell: ["Dumbbell", '<path d="M8 12h8"/><rect x="4" y="8" width="4" height="8" rx="1.5"/><rect x="16" y="8" width="4" height="8" rx="1.5"/>'],
+    cable: ["Cable", '<circle cx="12" cy="5" r="2.5"/><path d="M12 7.5V17"/><path d="M8 19h8"/>'],
+    machine: ["Machine", '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h6"/>'],
+    body: ["Bodyweight", '<circle cx="12" cy="5" r="2.2"/><path d="M12 8v7M8 11h8M12 15l-3 5M12 15l3 5"/>']
   };
-  const findEx = id => { for (const p in EX) for (const e of EX[p]) if (e[0] === id) return { id: e[0], name: e[1], en: e[2], equip: e[3], target: e[4], part: p }; return null; };
+  const findEx = id => { for (const p in EX) for (const e of EX[p]) if (e[0] === id) return { id: e[0], name: e[1], equip: e[2], target: e[3], part: p }; return null; };
 
   /* ---------- Figure ---------- */
   // Anatomy chart: left half drawn once, mirrored for the right. Each muscle names the part it belongs to.
@@ -125,8 +125,6 @@
     "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === "x" ? r : (r & 3 | 8)).toString(16); }));
 
   const $ = id => document.getElementById(id);
-  const ORD = ["첫", "두", "세", "네", "다섯", "여섯", "일곱", "여덟", "아홉", "열"];
-  const ordinal = n => (ORD[n - 1] ? ORD[n - 1] + "번째" : n + "번째");
   const fresh = (ex = null) => ({ ex, phase: "idle", set: 1, t0: 0, startedAt: 0, sets: [], breaks: [] });
   let s = fresh();
   try { const saved = JSON.parse(localStorage.getItem(KEY)); if (saved && saved.phase) s = saved; } catch (e) {}
@@ -188,11 +186,10 @@
         <div class="fig">${figure(k)}</div>
         <div class="label">
           <div class="name">${PARTS[k].name}</div>
-          <span class="pmeta">${lastPart(k)}</span>
+          <span class="count">${EX[k].length} exercises</span>
         </div>
       </button>`).join("");
     renderResume();
-    renderToday();
     setTone(active() ? s.ex.part : null);
     show("home");
   }
@@ -201,49 +198,16 @@
     const slot = $("resumeSlot");
     if (!active()) { slot.innerHTML = ""; return; }
     const ex = findEx(s.ex.id);
+    const state = s.phase === "rest" ? `Set ${s.set} complete · Resting` : `Set ${s.set} in progress`;
     slot.innerHTML = `<button class="resume rise" type="button" id="resumeBtn" style="--tone:var(${PARTS[ex.part].tone})">
-      <span><i class="dot"></i><b>${ex.name}</b></span><span class="t" id="resumeT"></span></button>`;
-  }
-
-  const EQ_EN = { barbell: "BARBELL", dumbbell: "DUMBBELL", cable: "CABLE", machine: "MACHINE", body: "BODYWEIGHT" };
-  const mmdd = t => { const d = new Date(t); return `${d.getMonth() + 1}/${d.getDate()}`; };
-  const fmtDur = ms => { const m = Math.round(ms / 60000); return m < 60 ? `${m}m` : `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, "0")}m`; };
-  function lastPart(part) {
-    const r = loadHistory().find(r => r.body_part === part);
-    return r ? mmdd(r.started_at) : "—";
-  }
-  function weekStart(d = new Date()) {
-    const x = new Date(d); x.setHours(0, 0, 0, 0); x.setDate(x.getDate() - (x.getDay() + 6) % 7); return x;
-  }
-  function renderToday() {
-    const h = loadHistory(), now = new Date(), ws = weekStart(now);
-    const inWeek = h.filter(r => new Date(r.started_at) >= ws);
-    const sets = inWeek.reduce((a, r) => a + (r.set_count || 0), 0);
-    const dur = inWeek.reduce((a, r) => a + (r.duration_ms || 0), 0);
-    const cols = Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(ws); d.setDate(ws.getDate() + i);
-      const key = d.toDateString(), isToday = key === now.toDateString();
-      const parts = [...new Set(h.filter(r => new Date(r.started_at).toDateString() === key).map(r => r.body_part))].filter(p => PARTS[p]);
-      return `<div class="day${isToday ? " is-today" : ""}${d > now && !isToday ? " future" : ""}">
-        <i>${parts.map(p => `<b style="--pt:var(${PARTS[p].tone})"></b>`).join("")}</i><span>${"MTWTFSS"[i]}</span></div>`;
-    }).join("");
-    $("today").innerHTML = `
-      <div class="today-top">
-        <div class="date"><span class="dnum">${String(now.getMonth() + 1).padStart(2, "0")}.${String(now.getDate()).padStart(2, "0")}</span><span class="dday">${["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"][now.getDay()]}</span></div>
-        <div class="stats">
-          <div><small>SESSIONS</small><span>${inWeek.length}</span></div>
-          <div><small>SETS</small><span>${sets}</span></div>
-          <div><small>TIME</small><span>${fmtDur(dur)}</span></div>
-        </div>
-      </div>
-      <div class="week">${cols}</div>`;
+      <span><i class="dot"></i><span><b>${ex.name}</b><small>${state}</small></span></span><span class="t" id="resumeT"></span></button>`;
   }
 
   function lastFor(id) {
     const r = loadHistory().find(r => r.exercise_id === id);
     if (!r) return "";
     const d = new Date(r.started_at);
-    return `${d.getMonth() + 1}/${d.getDate()} · ${r.set_count}`;
+    return `Last ${d.getMonth() + 1}/${d.getDate()} · ${r.set_count} sets`;
   }
 
   function renderList(part) {
@@ -253,12 +217,12 @@
     $("listFig").innerHTML = figure(part);
     $("listFig").style.setProperty("--pt", `var(${P.tone})`);
     $("listTitle").textContent = P.name;
-    $("listMeta").textContent = `${P.en} · ${String(EX[part].length).padStart(2, "0")} · LAST ${lastPart(part)}`;
-    $("exs").innerHTML = EX[part].map(([id, name, en, eq, target], i) => `
+    $("listSub").textContent = `${EX[part].length} exercises`;
+    $("exs").innerHTML = EX[part].map(([id, name, eq, target], i) => `
       <button class="card ex rise${active() && s.ex.id === id ? " active" : ""}" type="button" data-ex="${id}" style="--pt:var(${P.tone});--i:${i}">
-        <span class="ex-top"><span class="glyph"><svg viewBox="0 0 24 24">${EQUIP[eq][1]}</svg></span><span class="eq">${EQ_EN[eq]}</span></span>
-        <span class="name">${name}</span>
-        <span class="last">${active() && s.ex.id === id ? "●" : lastFor(id)}</span>
+        <span class="glyph"><svg viewBox="0 0 24 24">${EQUIP[eq][1]}</svg></span>
+        <span><div class="name">${name}</div><div class="tags">${EQUIP[eq][0]} · ${target}</div></span>
+        <span class="last">${active() && s.ex.id === id ? "In progress" : lastFor(id)}</span>
       </button>`).join("");
     show("list");
   }
@@ -285,7 +249,7 @@
     const x = e.target.closest("[data-ex]");
     if (x) {
       if (active() && s.ex.id !== x.dataset.ex) {
-        toast("진행 중인 운동이 있어요");
+        toast(`Finish ${s.ex.name} first`);
         const r = $("resumeBtn"); if (r) { r.classList.remove("pulse"); void r.offsetWidth; r.classList.add("pulse"); }
         return;
       }
@@ -308,7 +272,7 @@
   /* ---------- Timer ---------- */
   const pad = $("pad"), statusEl = $("status"), hintEl = $("hint"), endBtn = $("endBtn");
 
-  const hintFor = () => "";
+  const hintFor = () => s.phase === "rest" ? "Double-tap to start the next set" : "Double-tap when the set is done";
   function renderStatus() {
     if (view === "timer") {
       document.body.dataset.phase = s.phase;
@@ -316,13 +280,18 @@
     }
     let html = "";
     if (s.phase === "idle") {
-      html = `<div class="line now">1세트</div>`;
+      html = `<div class="line now">Set 1 in progress</div>`;
+      $("setLabel").textContent = "SET 1";
     } else if (s.phase === "rest") {
-      html = `<div class="line now">브레이크</div>`;
+      html = `<div class="line done">Set ${s.set} complete</div><div class="line now" style="--i:1">Break ${s.set} in progress</div>`;
+      $("setLabel").textContent = "BREAK " + s.set;
     } else if (s.set === 1) {
-      html = `<div class="line now">1세트</div>`;
+      html = `<div class="line now">Set 1 in progress</div>`;
+      $("setLabel").textContent = "SET 1";
     } else {
-      html = `<div class="line now">${s.set}세트</div>`;
+      html = `<div class="line done">Set ${s.set - 1} complete</div><div class="line done" style="--i:1">Break complete</div>
+              <div class="line now" style="--i:2">Set ${s.set} in progress</div>`;
+      $("setLabel").textContent = "SET " + s.set;
     }
     hintEl.textContent = hintFor();
     statusEl.innerHTML = html;
@@ -331,8 +300,7 @@
     const idle = s.phase === "idle";
     $("timerBack").hidden = !idle;
     $("startBtn").hidden = !idle;
-    [$("readout"), statusEl, $("foot"), endBtn].forEach(el => el.hidden = idle);
-    renderMetaBot();
+    [$("time"), statusEl, $("foot"), endBtn, $("setLabel")].forEach(el => el.hidden = idle);
   }
 
   /* ---------- 3D start button ---------- */
@@ -360,19 +328,13 @@
     save(); keepAwake();
     startBtn.classList.remove("launch", "pressed");
     renderStatus();
-    if (!rm) [$("readout"), statusEl, $("foot")].forEach((el, i) => el.animate(
+    if (!rm) [$("time"), statusEl, $("foot")].forEach((el, i) => el.animate(
       [{ opacity: 0, transform: "translateY(8px) scale(.96)", filter: "blur(10px)" }, { opacity: 1, transform: "none", filter: "none" }],
       { duration: 700, delay: i * 90, easing: "cubic-bezier(.2,.7,.1,1)", fill: "backwards" }));
     starting = false;
   }
 
-  const mmEl = $("mm"), csEl = $("cs"), metaTop = $("metaTop");
-  function renderMetaBot() {
-    let t = "";
-    if (s.phase === "rest") { const st = s.sets[s.sets.length - 1]; if (st && st.duration_ms != null) t = "SET " + fmt(st.duration_ms); }
-    else if (s.phase === "work") { const br = s.breaks[s.breaks.length - 1]; if (br) t = "REST " + fmt(br.duration_ms); }
-    $("metaBot").textContent = t;
-  }
+  const mmEl = $("mm"), csEl = $("cs");
   function frame() {
     const now = Date.now();
     if (view === "timer") {
@@ -380,8 +342,6 @@
       const [a, b] = split(ms);
       if (mmEl.textContent !== a) mmEl.textContent = a;
       if (csEl.textContent !== b) csEl.textContent = b;
-      const tot = s.startedAt && s.phase !== "idle" ? "TOTAL " + fmtShort(now - s.startedAt) : "";
-      if (metaTop.textContent !== tot) metaTop.textContent = tot;
     } else if (view === "home") {
       const r = $("resumeT");
       if (r && active()) r.textContent = fmtShort(now - s.t0);
@@ -471,7 +431,7 @@
     if (now - lastTap < GAP) {
       lastTap = 0; delete pad.dataset.armed; clearTimeout(armT); advance();
     } else {
-      lastTap = now; pad.dataset.armed = ""; hintEl.textContent = "한 번 더";
+      lastTap = now; pad.dataset.armed = ""; hintEl.textContent = "Tap again";
       clearTimeout(armT);
       armT = setTimeout(() => { delete pad.dataset.armed; hintEl.textContent = hintFor(); }, GAP);
     }
@@ -539,9 +499,9 @@
     s = fresh(); save();
     closeEnd();
     go("back", () => renderList(ex.part));
-    toast(keep ? "저장됨" : "종료됨");
+    toast(keep ? `Saved · ${ex.name}` : "Workout discarded");
   }
-  confirmable(endBtn, "종료", "한 번 더", openEnd);
+  confirmable(endBtn, "End", "Tap again", openEnd);
   $("saveBtn").addEventListener("click", () => finish(true));
   $("discardBtn").addEventListener("click", () => finish(false));
   $("keepBtn").addEventListener("click", closeEnd);
@@ -550,16 +510,17 @@
 
   /* ---------- Sheet ---------- */
   const sheet = $("sheet"), histEl = $("hist");
-  const dateLabel = t => { const d = new Date(t); return `${d.getMonth() + 1}월 ${d.getDate()}일 ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
+  const dateLabel = t => new Date(t).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
 
   function renderHist() {
     const h = loadHistory();
-    if (!h.length) { histEl.innerHTML = `<div class="empty">기록 없음</div>`; return; }
+    if (!h.length) { histEl.innerHTML = `<div class="empty">No workouts saved yet. Finish an exercise with End and choose Save.</div>`; return; }
     histEl.innerHTML = h.map(r => `
       <div class="row">
-        <span class="when">${(findEx(r.exercise_id) || {}).name || r.exercise_name || "운동"}<small>${dateLabel(r.started_at)}</small></span>
-        <span class="meta">${r.set_count}세트</span>
+        <span class="when">${(findEx(r.exercise_id) || {}).name || r.exercise_name || "Workout"}<small>${dateLabel(r.started_at)}${r.body_part && PARTS[r.body_part] ? " · " + PARTS[r.body_part].name : ""}</small></span>
+        <span class="meta">${r.set_count} sets</span>
         <span class="meta">${fmtShort(r.duration_ms)}</span>
+        <span class="rests">${r.breaks.length ? "Rest " + r.breaks.map(b => fmt(b.duration_ms)).join(" · ") : "No rests"}</span>
       </div>`).join("");
   }
   function openSheet() {
@@ -568,7 +529,7 @@
   }
   $("closeSheet").addEventListener("click", () => sheet.hidden = true);
   sheet.addEventListener("click", e => { if (e.target === sheet) sheet.hidden = true; });
-  confirmable($("clearBtn"), "전체 삭제", "한 번 더 누르면 삭제", async () => {
+  confirmable($("clearBtn"), "Clear all", "Tap again to clear", async () => {
     if (window.GTSync) await window.GTSync.clearAll(); else saveHistory([]);
     renderHist();
   });
@@ -577,12 +538,12 @@
   const syncNote = $("syncNote");
   if (window.GTSync) {
     window.GTSync.onChange(st => {
-      const pend = st.pending ? `동기화 대기 ${st.pending}개` : "";
+      const pend = st.pending ? `${st.pending} waiting to sync` : "";
       const text = {
         ok: pend,
         syncing: "",
-        offline: st.pending ? `오프라인 · ${pend}` : "",
-        error: `동기화 안 됨: ${st.message}${pend ? " · " + pend : ""}`,
+        offline: st.pending ? `Offline · ${pend}` : "",
+        error: `Not synced: ${st.message}${pend ? " · " + pend : ""}`,
         off: pend
       }[st.status] || "";
       syncNote.textContent = text;

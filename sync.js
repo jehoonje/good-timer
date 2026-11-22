@@ -20,7 +20,7 @@
   function init() {
     if (ready) return ready;
     ready = (async () => {
-      if (!window.supabase || !cfg.supabaseUrl) { set("off", "Supabase를 불러오지 못했어요"); return false; }
+      if (!window.supabase || !cfg.supabaseUrl) { set("off", "couldn't load Supabase"); return false; }
       client = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey, {
         auth: { persistSession: true, autoRefreshToken: true, storageKey: "gt-auth" }
       });
@@ -33,7 +33,7 @@
         return true;
       } catch (e) {
         ready = null;
-        const msg = /anonymous/i.test(e.message || "") ? "익명 로그인이 꺼져 있어요" : "로그인 실패";
+        const msg = /anonymous/i.test(e.message || "") ? "anonymous sign-in is off" : "sign-in failed";
         set("error", msg);
         return false;
       }
@@ -44,7 +44,7 @@
   const toRow = r => ({
     id: r.id,
     exercise_id: r.exercise_id || "unknown",
-    exercise_name: r.exercise_name || "운동",
+    exercise_name: r.exercise_name || "Workout",
     body_part: r.body_part || "back",
     equipment: r.equipment || null,
     started_at: r.started_at,
@@ -79,7 +79,7 @@
 
   async function sync() {
     if (busy) return;
-    if (!navigator.onLine) { set("offline", "오프라인"); return; }
+    if (!navigator.onLine) { set("offline", "offline"); return; }
     busy = true;
     set("syncing");
     try {
@@ -88,7 +88,7 @@
       await pull();
       set("ok");
     } catch (e) {
-      set("error", e.message || "동기화 실패");
+      set("error", e.message || "sync failed");
     } finally {
       busy = false;
     }
@@ -102,7 +102,7 @@
         const { data } = await client.auth.getUser();
         if (data && data.user) await client.from(cfg.table).delete().eq("user_id", data.user.id);
       }
-    } catch (e) { set("error", "클라우드 기록 삭제 실패"); return; }
+    } catch (e) { set("error", "couldn't clear cloud history"); return; }
     set(state.status === "error" ? "error" : "ok");
   }
 
