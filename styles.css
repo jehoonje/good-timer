@@ -18,6 +18,7 @@
   --warm: #d0915f;
   --red: #c97a70;
   --mist: #8e9a9d;
+  --fight: "Anton", "Impact", "Haettenschweiler", "Arial Narrow Bold", sans-serif;
   --t-back: #78a3a6;
   --t-chest: #c4917c;
   --t-shoulder: #9c98bd;
@@ -375,6 +376,44 @@ body[data-phase="rest"] #time .cs { color: var(--dim); }
 .hint { font-size: 12px; color: var(--faint); letter-spacing: .06em; transition: color .2s; }
 #pad[data-armed] .hint { color: var(--ink); }
 
+/* ---------- Announcer ---------- */
+.announce {
+  position: fixed; inset: 0; z-index: 18; pointer-events: none;
+  display: grid; place-items: center;
+  --ann: var(--red);
+  overflow: hidden;
+}
+.announce[data-kind="rest"] { --ann: var(--mist); }
+.ann-band {
+  position: absolute; left: -5%; right: -5%; top: 50%; height: clamp(120px, 30vw, 220px); margin-top: calc(clamp(120px, 30vw, 220px) / -2);
+  background:
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, .05) 0 1px, transparent 1px 5px),
+    linear-gradient(90deg, transparent, color-mix(in oklab, var(--ann) 28%, rgba(8, 10, 12, .7)) 18%, color-mix(in oklab, var(--ann) 34%, rgba(8, 10, 12, .75)) 50%, color-mix(in oklab, var(--ann) 28%, rgba(8, 10, 12, .7)) 82%, transparent);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  box-shadow: 0 -1px 0 color-mix(in oklab, var(--ann) 50%, transparent), 0 1px 0 color-mix(in oklab, var(--ann) 50%, transparent);
+  transform-origin: center;
+}
+.ann-band::before {
+  content: ""; position: absolute; inset: 0;
+  background: repeating-linear-gradient(90deg, transparent 0 40px, rgba(255, 255, 255, .06) 40px 42px, transparent 42px 110px);
+  animation: streak .35s linear infinite;
+}
+@keyframes streak { to { background-position: -110px 0; } }
+.ann-flash { position: absolute; inset: 0; background: radial-gradient(60% 35% at 50% 50%, color-mix(in oklab, var(--ann) 40%, white 30%), transparent 70%); opacity: 0; }
+.ann-word {
+  grid-area: 1 / 1;
+  font-family: var(--fight); font-weight: 400;
+  font-size: clamp(64px, 21vw, 168px); line-height: .9; letter-spacing: .02em; white-space: nowrap;
+  text-transform: uppercase;
+  color: #f2f4f3;
+  background: linear-gradient(180deg, #ffffff 0%, #eef1f0 46%, color-mix(in oklab, var(--ann) 60%, #ffffff) 52%, color-mix(in oklab, var(--ann) 85%, #2a1a18) 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1px rgba(0, 0, 0, .35);
+  filter: drop-shadow(0 4px 0 rgba(0, 0, 0, .45)) drop-shadow(0 0 22px color-mix(in oklab, var(--ann) 55%, transparent));
+  opacity: 0;
+}
+.ann-word.sub { font-size: clamp(52px, 17vw, 132px); }
+
 /* ---------- Sheet ---------- */
 .sheet {
   position: fixed; inset: 0; z-index: 20;
@@ -466,6 +505,7 @@ body[data-phase="rest"] #time .cs { color: var(--dim); }
   .part .fig { height: 136px; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .ann-band::before { animation: none !important; }
   .glow i, .resume .dot, .status .line.now::before, .figure .hl, .start, .start .halo, .start .halo::after { animation: none !important; }
   .rise, .status .line, #log span, .sheet, .sheet-card, .modal, .modal-card, .toast, .view.enter, .view.enter-back { animation: none !important; }
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }

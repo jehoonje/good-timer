@@ -332,6 +332,7 @@
       [{ opacity: 0, transform: "translateY(8px) scale(.96)", filter: "blur(10px)" }, { opacity: 1, transform: "none", filter: "none" }],
       { duration: 700, delay: i * 90, easing: "cubic-bezier(.2,.7,.1,1)", fill: "backwards" }));
     starting = false;
+    announce("work", 1);
   }
 
   const mmEl = $("mm"), csEl = $("cs");
@@ -373,6 +374,56 @@
     try { navigator.vibrate && navigator.vibrate(25); } catch (e) {}
     keepAwake(); save(); renderStatus();
     land(ghost);
+    announce(s.phase === "rest" ? "rest" : "work", s.set);
+  }
+
+  /* ---------- Fighting-game style announcer ---------- */
+  // Two beats, like "ROUND 1 → FIGHT!": the label slams in with a shake and flash, then the call word.
+  const ann = $("announce"), annMain = $("annMain"), annSub = $("annSub"), annBand = ann.querySelector(".ann-band"), annFlash = ann.querySelector(".ann-flash");
+  let annRun = 0;
+  function announce(kind, n) {
+    const run = ++annRun;
+    ann.getAnimations({ subtree: true }).forEach(a => a.cancel());
+    ann.dataset.kind = kind;
+    annMain.textContent = (kind === "rest" ? "BREAK " : "SET ") + n;
+    annSub.textContent = kind === "rest" ? "RECOVER" : "GO!";
+    ann.hidden = false;
+    const done = () => { if (run === annRun) ann.hidden = true; };
+    if (reduced()) {
+      annSub.style.opacity = "0";
+      annMain.animate([{ opacity: 0 }, { opacity: 1, offset: .2 }, { opacity: 1, offset: .8 }, { opacity: 0 }], { duration: 1000 }).finished.then(done, () => {});
+      return;
+    }
+    annSub.style.opacity = "";
+    const E = "cubic-bezier(.2,.9,.2,1)";
+    annBand.animate([
+      { transform: "scaleY(0) scaleX(.2)", opacity: 0 },
+      { transform: "scaleY(1) scaleX(1)", opacity: 1, offset: .12 },
+      { transform: "scaleY(1) scaleX(1)", opacity: 1, offset: .82 },
+      { transform: "scaleY(0) scaleX(1.1)", opacity: 0 }
+    ], { duration: 1500, easing: "ease-out", fill: "both" });
+    annMain.animate([
+      { transform: "skewX(-12deg) scale(3.2)", opacity: 0, filter: "blur(14px)" },
+      { transform: "skewX(-12deg) scale(.94)", opacity: 1, filter: "blur(0)", offset: .14 },
+      { transform: "skewX(-12deg) scale(1.03)", offset: .2 },
+      { transform: "skewX(-12deg) scale(1)", opacity: 1, offset: .5 },
+      { transform: "skewX(-24deg) translateX(60vw) scaleX(1.6)", opacity: 0, filter: "blur(6px)", offset: .62 },
+      { transform: "skewX(-24deg) translateX(60vw) scaleX(1.6)", opacity: 0 }
+    ], { duration: 1500, easing: E, fill: "both" });
+    annSub.animate([
+      { transform: "skewX(-12deg) scale(2.6)", opacity: 0, filter: "blur(10px)" },
+      { transform: "skewX(-12deg) scale(2.6)", opacity: 0, filter: "blur(10px)", offset: .55 },
+      { transform: "skewX(-12deg) scale(.95)", opacity: 1, filter: "blur(0)", offset: .66 },
+      { transform: "skewX(-12deg) scale(1)", opacity: 1, offset: .84 },
+      { transform: "skewX(-12deg) scale(1.15)", opacity: 0, filter: "blur(8px)" }
+    ], { duration: 1500, easing: E, fill: "both" });
+    annFlash.animate([{ opacity: 0 }, { opacity: 0, offset: .1 }, { opacity: .55, offset: .14 }, { opacity: 0, offset: .3 },
+                      { opacity: 0, offset: .64 }, { opacity: .35, offset: .67 }, { opacity: 0, offset: .8 }, { opacity: 0 }],
+                     { duration: 1500, fill: "both" });
+    const shake = [0, 1, 2, 3, 4, 5].map(i => ({ transform: i === 5 ? "none" : `translate(${(i % 2 ? -1 : 1) * (6 - i)}px, ${(i % 2 ? 1 : -1) * (4 - i * .6)}px)` }));
+    setTimeout(() => { if (run === annRun) pad.animate(shake, { duration: 220, easing: "ease-out" }); try { navigator.vibrate && navigator.vibrate([18, 30, 18]); } catch (e) {} }, 200);
+    setTimeout(() => { if (run === annRun) pad.animate(shake.map(k => ({ transform: k.transform.replace(/(-?\d+(\.\d+)?)px/g, (m, v) => (v * .5) + "px") })), { duration: 160 }); }, 1000);
+    annMain.getAnimations()[0].finished.then(done, () => {});
   }
 
   /* ---------- Log + "number drops into the log" motion ---------- */
