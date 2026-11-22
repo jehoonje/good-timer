@@ -128,7 +128,7 @@ h1 {
   font-size: clamp(30px, 8.5vw, 46px); letter-spacing: -.015em; line-height: 1.12;
   margin: 30px 0 8px; text-wrap: balance;
 }
-.lede { color: var(--dim); font-size: 13px; margin: 0 0 24px; }
+#home h1 { margin-bottom: 24px; }
 
 /* entry motion for repeated items */
 @keyframes rise {
@@ -173,7 +173,7 @@ h1 {
   display: flex; align-items: center; justify-content: center;
 }
 .part .fig svg { height: 100%; width: auto; overflow: visible; }
-.part .label { position: relative; display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; padding: 0 4px; }
+.part .label { position: relative; display: flex; flex-direction: column; gap: 3px; padding: 0 4px; }
 .part .name { font-size: 18px; font-weight: 500; }
 .part .meta { font-size: 10px; letter-spacing: .16em; color: var(--pt); margin-top: 2px; }
 .part .count { font-family: var(--num); font-size: 12px; color: var(--dim); font-variant-numeric: tabular-nums; }
@@ -235,7 +235,9 @@ h1 {
 }
 #pad[data-armed]::after { opacity: 1; transition-duration: .08s; }
 .ex-title { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; min-width: 0; }
-.ex-title .back span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+.ex-row { display: flex; align-items: center; gap: 10px; min-width: 0; max-width: 100%; }
+.back.icon { padding: 9px; flex: none; }
+.ex-name { font-size: 16px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 .ex-title .eyebrow { padding-left: 4px; }
 .actions { display: flex; gap: 8px; flex: none; align-self: flex-start; }
 
@@ -246,27 +248,6 @@ h1 {
   gap: clamp(14px, 4vw, 34px);
   min-width: 0; min-height: 0;
 }
-.dial {
-  position: absolute; left: 50%; top: 50%;
-  width: min(88vw, 62vh, 560px); height: auto; aspect-ratio: 1; max-width: 100%;
-  transform: translate(-50%, -50%);
-  pointer-events: none; overflow: visible;
-}
-.dial .tk { stroke: var(--ink); stroke-opacity: .08; stroke-width: .5; stroke-linecap: round; }
-.dial .tk.major { stroke-opacity: .2; stroke-width: .7; }
-.dial .sweep {
-  fill: none; stroke: var(--tone); stroke-width: 1.1; stroke-linecap: round;
-  stroke-dasharray: 0 1000; transform: rotate(-90deg);
-  filter: drop-shadow(0 0 3px var(--tone)); opacity: .9;
-  transition: stroke .8s ease, opacity .8s ease;
-}
-.dial .tip { fill: var(--tone); filter: drop-shadow(0 0 4px var(--tone)); transition: fill .8s ease, opacity .8s ease; }
-body[data-phase="rest"] .dial .sweep, body[data-phase="rest"] .dial .tip { stroke: var(--warm); --tone: var(--warm); }
-body[data-phase="rest"] .dial .tip { fill: var(--warm); }
-body[data-phase="work"] .dial .sweep { opacity: .35; }
-body[data-phase="work"] .dial .tip { opacity: .45; }
-body[data-phase="idle"] .dial .sweep, body[data-phase="idle"] .dial .tip { opacity: 0; }
-
 #time {
   position: relative;
   font-family: var(--num); font-weight: 200;
@@ -351,6 +332,34 @@ body[data-phase="rest"] .status .line.now::before { background: var(--warm); box
 .sheet-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
 .note { font-size: 11px; color: var(--faint); }
 
+/* ---------- End modal ---------- */
+.modal {
+  position: fixed; inset: 0; z-index: 25;
+  display: flex; align-items: center; justify-content: center;
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
+  background: rgba(5, 7, 8, .5);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  animation: fade .3s ease both;
+}
+.modal-card {
+  width: 100%; max-width: 380px;
+  display: flex; flex-direction: column; gap: 16px;
+  padding: 22px 20px 14px; border-radius: 28px;
+  background: rgba(22, 28, 30, .6);
+  -webkit-backdrop-filter: blur(28px) saturate(150%); backdrop-filter: blur(28px) saturate(150%);
+  box-shadow: var(--sheen), 0 30px 60px -20px rgba(0, 0, 0, .8);
+  animation: pop .45s var(--ease) both;
+}
+@keyframes pop { from { opacity: 0; transform: scale(.92) translateY(10px); filter: blur(4px); } }
+.modal-card h2 { margin: -8px 0 0; font-family: var(--num); font-weight: 300; font-size: 24px; letter-spacing: -.01em; text-wrap: balance; }
+.modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+.modal-actions .pill { padding: 14px 12px; font-size: 14px; white-space: normal; text-align: center; }
+.pill.quiet { background: var(--glass); color: var(--dim); }
+.pill.primary { background: color-mix(in oklab, var(--tone) 70%, white 8%); color: #0b1010; font-weight: 500; }
+.keep { background: none; color: var(--dim); font-size: 13px; padding: 8px; cursor: pointer; }
+.keep:focus-visible { outline: 2px solid var(--ink); border-radius: 8px; }
+
 /* ---------- View transitions ---------- */
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .5s; animation-timing-function: var(--ease); }
 ::view-transition-old(root) { animation-name: vt-out; }
@@ -373,6 +382,6 @@ body[data-phase="rest"] .status .line.now::before { background: var(--warm); box
 }
 @media (prefers-reduced-motion: reduce) {
   .glow i, .resume .dot, .status .line.now::before, .figure .hl { animation: none !important; }
-  .rise, .status .line, #log span, .sheet, .sheet-card, .toast, .view.enter, .view.enter-back { animation: none !important; }
+  .rise, .status .line, #log span, .sheet, .sheet-card, .modal, .modal-card, .toast, .view.enter, .view.enter-back { animation: none !important; }
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -23,11 +23,10 @@
 <!-- Home: body parts -->
 <section class="view" id="home">
   <div class="bar">
-    <span class="eyebrow">WORKOUT</span>
-    <button class="pill" data-history type="button">기록</button>
+    <span class="eyebrow">GOOD TIMER</span>
+    <button class="pill" data-history type="button">History</button>
   </div>
-  <h1>오늘은 어디를 할까요</h1>
-  <p class="lede">부위를 고르면 대표 운동이 나와요.</p>
+  <h1>What are you training today?</h1>
   <div id="resumeSlot"></div>
   <div class="parts" id="parts"></div>
 </section>
@@ -35,8 +34,7 @@
 <!-- Exercise list -->
 <section class="view" id="list" hidden>
   <div class="bar">
-    <button class="back" id="listBack" type="button"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 5 8l5 5"/></svg>부위 선택</button>
-    <button class="pill" data-history type="button">기록</button>
+    <button class="back" id="listBack" type="button"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 5 8l5 5"/></svg>Body parts</button>
   </div>
   <div class="list-head">
     <div class="fig" id="listFig"></div>
@@ -49,45 +47,53 @@
 </section>
 
 <!-- Timer -->
-<section class="view" id="pad" hidden role="button" tabindex="0" aria-label="두 번 탭해서 세트 / 브레이크 전환">
+<section class="view" id="pad" hidden role="button" tabindex="0" aria-label="Double-tap to switch between set and break">
   <div class="bar">
     <div class="ex-title">
-      <button class="back" id="timerBack" type="button"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 5 8l5 5"/></svg><span id="exName"></span></button>
+      <div class="ex-row">
+        <button class="back icon" id="timerBack" type="button" aria-label="Back to exercises"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 5 8l5 5"/></svg></button>
+        <span class="ex-name" id="exName"></span>
+      </div>
       <span class="eyebrow" id="setLabel">SET 1</span>
     </div>
     <div class="actions">
-      <button class="pill" data-history type="button">기록</button>
-      <button class="pill" id="endBtn" type="button">끝내기</button>
+      <button class="pill" id="endBtn" type="button">End</button>
     </div>
   </div>
   <div class="center">
-    <svg class="dial" id="dial" viewBox="-100 -100 200 200" aria-hidden="true">
-      <g id="ticks"></g>
-      <circle class="sweep" id="sweep" r="88" pathLength="1000"/>
-      <circle class="tip" id="tip" r="2.4" cx="0" cy="-88"/>
-    </svg>
     <div id="time"><span id="mm">0:00</span><span class="cs" id="cs">.00</span></div>
     <div class="status" id="status" aria-live="polite"></div>
   </div>
   <div class="foot">
     <div id="log"></div>
-    <div class="hint" id="hint">세트가 끝나면 두 번 탭</div>
+    <div class="hint" id="hint">Double-tap when the set is done</div>
   </div>
 </section>
 
 <div class="sheet" id="sheet" hidden>
   <div class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
     <div class="sheet-head">
-      <h2 id="sheetTitle">운동 기록</h2>
-      <button class="pill" id="closeSheet" type="button">닫기</button>
+      <h2 id="sheetTitle">History</h2>
+      <button class="pill" id="closeSheet" type="button">Close</button>
     </div>
-    <div class="summary" id="summary" hidden></div>
     <div class="list" id="hist"></div>
-    <div class="note" id="syncNote">기록은 이 기기에 먼저 저장되고 클라우드로 동기화돼요.</div>
+    <div class="note" id="syncNote" hidden></div>
     <div class="sheet-actions">
-      <button class="pill" id="clearBtn" type="button">전체 삭제</button>
-      <button class="pill" id="copyBtn" type="button">JSON 복사</button>
+      <button class="pill" id="clearBtn" type="button">Clear all</button>
     </div>
+  </div>
+</div>
+
+<div class="modal" id="endModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="endTitle">
+    <div class="eyebrow" id="endTitle">FINISH EXERCISE</div>
+    <h2 id="endEx"></h2>
+    <div class="summary" id="endSummary"></div>
+    <div class="modal-actions">
+      <button class="pill quiet" id="discardBtn" type="button">End without saving</button>
+      <button class="pill primary" id="saveBtn" type="button">Save</button>
+    </div>
+    <button class="keep" id="keepBtn" type="button">Keep going</button>
   </div>
 </div>
 

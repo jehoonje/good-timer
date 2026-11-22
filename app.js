@@ -1,70 +1,70 @@
 (() => {
   /* ---------- Data ---------- */
   const PARTS = {
-    back:     { name: "등",   en: "BACK",      tone: "--t-back",     view: "back" },
-    chest:    { name: "가슴", en: "CHEST",     tone: "--t-chest",    view: "front" },
-    shoulder: { name: "어깨", en: "SHOULDERS", tone: "--t-shoulder", view: "front" },
-    legs:     { name: "하체", en: "LEGS",      tone: "--t-legs",     view: "front" }
+    back:     { name: "Back",      tone: "--t-back",     view: "back" },
+    chest:    { name: "Chest",     tone: "--t-chest",    view: "front" },
+    shoulder: { name: "Shoulders", tone: "--t-shoulder", view: "front" },
+    legs:     { name: "Legs",      tone: "--t-legs",     view: "front" }
   };
-  // [id, 이름, 장비, 주 타깃]
+  // [id, name, equipment, primary target]
   const EX = {
     back: [
-      ["deadlift", "데드리프트", "barbell", "척추기립근 · 둔근"],
-      ["pull-up", "풀업", "body", "광배근"],
-      ["lat-pulldown", "랫풀다운", "cable", "광배근"],
-      ["barbell-row", "바벨 로우", "barbell", "광배 · 능형근"],
-      ["one-arm-db-row", "원암 덤벨 로우", "dumbbell", "광배근"],
-      ["seated-cable-row", "시티드 케이블 로우", "cable", "중부 등"],
-      ["t-bar-row", "T바 로우", "barbell", "중부 등"],
-      ["straight-arm-pulldown", "스트레이트 암 풀다운", "cable", "광배근"],
-      ["hyperextension", "백 익스텐션", "body", "척추기립근"],
-      ["shrug", "슈러그", "dumbbell", "승모근"]
+      ["deadlift", "Deadlift", "barbell", "Lower back · Glutes"],
+      ["pull-up", "Pull-up", "body", "Lats"],
+      ["lat-pulldown", "Lat Pulldown", "cable", "Lats"],
+      ["barbell-row", "Barbell Row", "barbell", "Lats · Rhomboids"],
+      ["one-arm-db-row", "One-Arm Dumbbell Row", "dumbbell", "Lats"],
+      ["seated-cable-row", "Seated Cable Row", "cable", "Mid back"],
+      ["t-bar-row", "T-Bar Row", "barbell", "Mid back"],
+      ["straight-arm-pulldown", "Straight-Arm Pulldown", "cable", "Lats"],
+      ["hyperextension", "Back Extension", "body", "Lower back"],
+      ["shrug", "Shrug", "dumbbell", "Traps"]
     ],
     chest: [
-      ["bench-press", "벤치프레스", "barbell", "대흉근"],
-      ["incline-bench", "인클라인 벤치프레스", "barbell", "윗가슴"],
-      ["decline-bench", "디클라인 벤치프레스", "barbell", "아랫가슴"],
-      ["db-press", "덤벨 프레스", "dumbbell", "대흉근"],
-      ["incline-db-press", "인클라인 덤벨 프레스", "dumbbell", "윗가슴"],
-      ["db-fly", "덤벨 플라이", "dumbbell", "가슴 안쪽"],
-      ["cable-crossover", "케이블 크로스오버", "cable", "가슴 안쪽"],
-      ["chest-press", "체스트 프레스 머신", "machine", "대흉근"],
-      ["pec-deck", "펙덱 플라이", "machine", "가슴 안쪽"],
-      ["dips", "딥스", "body", "아랫가슴 · 삼두"],
-      ["push-up", "푸시업", "body", "대흉근"]
+      ["bench-press", "Bench Press", "barbell", "Pecs"],
+      ["incline-bench", "Incline Bench Press", "barbell", "Upper chest"],
+      ["decline-bench", "Decline Bench Press", "barbell", "Lower chest"],
+      ["db-press", "Dumbbell Press", "dumbbell", "Pecs"],
+      ["incline-db-press", "Incline Dumbbell Press", "dumbbell", "Upper chest"],
+      ["db-fly", "Dumbbell Fly", "dumbbell", "Inner chest"],
+      ["cable-crossover", "Cable Crossover", "cable", "Inner chest"],
+      ["chest-press", "Machine Chest Press", "machine", "Pecs"],
+      ["pec-deck", "Pec Deck", "machine", "Inner chest"],
+      ["dips", "Dips", "body", "Lower chest · Triceps"],
+      ["push-up", "Push-up", "body", "Pecs"]
     ],
     shoulder: [
-      ["ohp", "오버헤드 프레스", "barbell", "전면 · 측면 삼각근"],
-      ["db-shoulder-press", "덤벨 숄더 프레스", "dumbbell", "전면 삼각근"],
-      ["arnold-press", "아놀드 프레스", "dumbbell", "삼각근 전체"],
-      ["machine-shoulder-press", "머신 숄더 프레스", "machine", "전면 삼각근"],
-      ["lateral-raise", "사이드 레터럴 레이즈", "dumbbell", "측면 삼각근"],
-      ["cable-lateral-raise", "케이블 레터럴 레이즈", "cable", "측면 삼각근"],
-      ["front-raise", "프론트 레이즈", "dumbbell", "전면 삼각근"],
-      ["rear-delt-fly", "리어 델트 플라이", "dumbbell", "후면 삼각근"],
-      ["face-pull", "페이스 풀", "cable", "후면 삼각근"],
-      ["upright-row", "업라이트 로우", "barbell", "측면 삼각근 · 승모"]
+      ["ohp", "Overhead Press", "barbell", "Front · Side delts"],
+      ["db-shoulder-press", "Dumbbell Shoulder Press", "dumbbell", "Front delts"],
+      ["arnold-press", "Arnold Press", "dumbbell", "All delts"],
+      ["machine-shoulder-press", "Machine Shoulder Press", "machine", "Front delts"],
+      ["lateral-raise", "Lateral Raise", "dumbbell", "Side delts"],
+      ["cable-lateral-raise", "Cable Lateral Raise", "cable", "Side delts"],
+      ["front-raise", "Front Raise", "dumbbell", "Front delts"],
+      ["rear-delt-fly", "Rear Delt Fly", "dumbbell", "Rear delts"],
+      ["face-pull", "Face Pull", "cable", "Rear delts"],
+      ["upright-row", "Upright Row", "barbell", "Side delts · Traps"]
     ],
     legs: [
-      ["back-squat", "백 스쿼트", "barbell", "대퇴사두 · 둔근"],
-      ["front-squat", "프론트 스쿼트", "barbell", "대퇴사두"],
-      ["leg-press", "레그 프레스", "machine", "대퇴사두"],
-      ["hack-squat", "핵 스쿼트", "machine", "대퇴사두"],
-      ["rdl", "루마니안 데드리프트", "barbell", "햄스트링 · 둔근"],
-      ["lunge", "런지", "dumbbell", "대퇴사두 · 둔근"],
-      ["bulgarian-split-squat", "불가리안 스플릿 스쿼트", "dumbbell", "대퇴사두 · 둔근"],
-      ["leg-extension", "레그 익스텐션", "machine", "대퇴사두"],
-      ["leg-curl", "레그 컬", "machine", "햄스트링"],
-      ["hip-thrust", "힙 쓰러스트", "barbell", "둔근"],
-      ["calf-raise", "카프 레이즈", "machine", "종아리"]
+      ["back-squat", "Back Squat", "barbell", "Quads · Glutes"],
+      ["front-squat", "Front Squat", "barbell", "Quads"],
+      ["leg-press", "Leg Press", "machine", "Quads"],
+      ["hack-squat", "Hack Squat", "machine", "Quads"],
+      ["rdl", "Romanian Deadlift", "barbell", "Hamstrings · Glutes"],
+      ["lunge", "Lunge", "dumbbell", "Quads · Glutes"],
+      ["bulgarian-split-squat", "Bulgarian Split Squat", "dumbbell", "Quads · Glutes"],
+      ["leg-extension", "Leg Extension", "machine", "Quads"],
+      ["leg-curl", "Leg Curl", "machine", "Hamstrings"],
+      ["hip-thrust", "Hip Thrust", "barbell", "Glutes"],
+      ["calf-raise", "Calf Raise", "machine", "Calves"]
     ]
   };
   const EQUIP = {
-    barbell: ["바벨", '<path d="M2 12h20"/><rect x="4" y="7" width="3" height="10" rx="1"/><rect x="17" y="7" width="3" height="10" rx="1"/>'],
-    dumbbell: ["덤벨", '<path d="M8 12h8"/><rect x="4" y="8" width="4" height="8" rx="1.5"/><rect x="16" y="8" width="4" height="8" rx="1.5"/>'],
-    cable: ["케이블", '<circle cx="12" cy="5" r="2.5"/><path d="M12 7.5V17"/><path d="M8 19h8"/>'],
-    machine: ["머신", '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h6"/>'],
-    body: ["맨몸", '<circle cx="12" cy="5" r="2.2"/><path d="M12 8v7M8 11h8M12 15l-3 5M12 15l3 5"/>']
+    barbell: ["Barbell", '<path d="M2 12h20"/><rect x="4" y="7" width="3" height="10" rx="1"/><rect x="17" y="7" width="3" height="10" rx="1"/>'],
+    dumbbell: ["Dumbbell", '<path d="M8 12h8"/><rect x="4" y="8" width="4" height="8" rx="1.5"/><rect x="16" y="8" width="4" height="8" rx="1.5"/>'],
+    cable: ["Cable", '<circle cx="12" cy="5" r="2.5"/><path d="M12 7.5V17"/><path d="M8 19h8"/>'],
+    machine: ["Machine", '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h6"/>'],
+    body: ["Bodyweight", '<circle cx="12" cy="5" r="2.2"/><path d="M12 8v7M8 11h8M12 15l-3 5M12 15l3 5"/>']
   };
   const findEx = id => { for (const p in EX) for (const e of EX[p]) if (e[0] === id) return { id: e[0], name: e[1], equip: e[2], target: e[3], part: p }; return null; };
 
@@ -120,8 +120,6 @@
   /* ---------- State ---------- */
   const KEY = "set-break-timer-v3";
   const HKEY = "set-break-sessions-v1";
-  const ORD = ["첫", "두", "세", "네", "다섯", "여섯", "일곱", "여덟", "아홉", "열"];
-  const ordinal = n => (ORD[n - 1] || n) + "번째";
   const iso = t => t ? new Date(t).toISOString() : null;
   const uid = () => (crypto.randomUUID ? crypto.randomUUID() :
     "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === "x" ? r : (r & 3 | 8)).toString(16); }));
@@ -187,8 +185,8 @@
       <button class="card part rise" type="button" data-part="${k}" style="--pt:var(${PARTS[k].tone});--i:${i}">
         <div class="fig">${figure(k)}</div>
         <div class="label">
-          <div><div class="name">${PARTS[k].name}</div><div class="meta">${PARTS[k].en}</div></div>
-          <span class="count">${EX[k].length}</span>
+          <div class="name">${PARTS[k].name}</div>
+          <span class="count">${EX[k].length} exercises</span>
         </div>
       </button>`).join("");
     renderResume();
@@ -200,7 +198,7 @@
     const slot = $("resumeSlot");
     if (!active()) { slot.innerHTML = ""; return; }
     const ex = findEx(s.ex.id);
-    const state = s.phase === "rest" ? `${s.set}세트 완료 · 브레이크 중` : `${s.set}세트 진행중`;
+    const state = s.phase === "rest" ? `Set ${s.set} complete · Resting` : `Set ${s.set} in progress`;
     slot.innerHTML = `<button class="resume rise" type="button" id="resumeBtn" style="--tone:var(${PARTS[ex.part].tone})">
       <span><i class="dot"></i><span><b>${ex.name}</b><small>${state}</small></span></span><span class="t" id="resumeT"></span></button>`;
   }
@@ -209,7 +207,7 @@
     const r = loadHistory().find(r => r.exercise_id === id);
     if (!r) return "";
     const d = new Date(r.started_at);
-    return `최근 ${d.getMonth() + 1}/${d.getDate()} · ${r.set_count}세트`;
+    return `Last ${d.getMonth() + 1}/${d.getDate()} · ${r.set_count} sets`;
   }
 
   function renderList(part) {
@@ -219,12 +217,12 @@
     $("listFig").innerHTML = figure(part);
     $("listFig").style.setProperty("--pt", `var(${P.tone})`);
     $("listTitle").textContent = P.name;
-    $("listSub").textContent = `${P.en} · ${EX[part].length}개 운동`;
+    $("listSub").textContent = `${EX[part].length} exercises`;
     $("exs").innerHTML = EX[part].map(([id, name, eq, target], i) => `
       <button class="card ex rise${active() && s.ex.id === id ? " active" : ""}" type="button" data-ex="${id}" style="--pt:var(${P.tone});--i:${i}">
         <span class="glyph"><svg viewBox="0 0 24 24">${EQUIP[eq][1]}</svg></span>
         <span><div class="name">${name}</div><div class="tags">${EQUIP[eq][0]} · ${target}</div></span>
-        <span class="last">${active() && s.ex.id === id ? "진행 중" : lastFor(id)}</span>
+        <span class="last">${active() && s.ex.id === id ? "In progress" : lastFor(id)}</span>
       </button>`).join("");
     show("list");
   }
@@ -251,7 +249,7 @@
     const x = e.target.closest("[data-ex]");
     if (x) {
       if (active() && s.ex.id !== x.dataset.ex) {
-        toast(`${s.ex.name}을(를) 먼저 끝내주세요`);
+        toast(`Finish ${s.ex.name} first`);
         const r = $("resumeBtn"); if (r) { r.classList.remove("pulse"); void r.offsetWidth; r.classList.add("pulse"); }
         return;
       }
@@ -271,44 +269,29 @@
     go("back", () => renderList(curPart));
   });
 
-  /* ---------- Dial ---------- */
-  $("ticks").innerHTML = Array.from({ length: 60 }, (_, i) => {
-    const a = i / 60 * Math.PI * 2, major = i % 5 === 0;
-    const r1 = 94, r2 = major ? 99 : 97;
-    const sx = Math.sin(a), cy = -Math.cos(a);
-    return `<line class="tk${major ? " major" : ""}" x1="${(sx * r1).toFixed(2)}" y1="${(cy * r1).toFixed(2)}" x2="${(sx * r2).toFixed(2)}" y2="${(cy * r2).toFixed(2)}"/>`;
-  }).join("");
-  const sweep = $("sweep"), tip = $("tip");
-  function drawDial(ms) {
-    const f = (ms % 60000) / 60000;
-    sweep.style.strokeDasharray = `${(f * 1000).toFixed(1)} 1000`;
-    const a = f * Math.PI * 2;
-    tip.setAttribute("cx", (Math.sin(a) * 88).toFixed(2));
-    tip.setAttribute("cy", (-Math.cos(a) * 88).toFixed(2));
-  }
-
   /* ---------- Timer ---------- */
   const pad = $("pad"), statusEl = $("status"), hintEl = $("hint"), endBtn = $("endBtn");
 
-  const hintFor = () => s.phase === "rest" ? "다음 세트 시작할 때 두 번 탭" : "세트가 끝나면 두 번 탭";
+  const hintFor = () => s.phase === "rest" ? "Double-tap to start the next set" : "Double-tap when the set is done";
   function renderStatus() {
     if (view === "timer") document.body.dataset.phase = s.phase;
     let html = "";
     if (s.phase === "idle") {
-      html = `<div class="line now">1세트 진행중</div>`;
+      html = `<div class="line now">Set 1 in progress</div>`;
       $("setLabel").textContent = "SET 1";
     } else if (s.phase === "rest") {
-      html = `<div class="line done">${s.set}세트 완료</div><div class="line now" style="--i:1">${ordinal(s.set)} 브레이크 중</div>`;
+      html = `<div class="line done">Set ${s.set} complete</div><div class="line now" style="--i:1">Break ${s.set} in progress</div>`;
       $("setLabel").textContent = "BREAK " + s.set;
     } else {
-      html = `<div class="line done">${s.set - 1}세트 완료</div><div class="line done" style="--i:1">브레이크 완료</div>
-              <div class="line now" style="--i:2">${s.set}세트 진행중</div><div class="sub" id="setElapsed"></div>`;
+      html = `<div class="line done">Set ${s.set - 1} complete</div><div class="line done" style="--i:1">Break complete</div>
+              <div class="line now" style="--i:2">Set ${s.set} in progress</div><div class="sub" id="setElapsed"></div>`;
       $("setLabel").textContent = "SET " + s.set;
     }
     hintEl.textContent = hintFor();
     statusEl.innerHTML = html;
     $("log").innerHTML = s.breaks.map(b => `<span><b>${b.n}</b>${fmt(b.duration_ms)}</span>`).join("");
     endBtn.disabled = s.phase === "idle";
+    $("timerBack").hidden = s.phase !== "idle";
   }
 
   const mmEl = $("mm"), csEl = $("cs");
@@ -321,9 +304,8 @@
         const last = s.breaks[s.breaks.length - 1];
         ms = last ? last.duration_ms : 0;
         const el = $("setElapsed");
-        if (el) el.textContent = "세트 " + fmtShort(now - s.t0);
+        if (el) el.textContent = "Set time " + fmtShort(now - s.t0);
       }
-      drawDial(s.phase === "rest" ? ms : s.phase === "work" ? now - s.t0 : 0);
       const [a, b] = split(ms);
       if (mmEl.textContent !== a) mmEl.textContent = a;
       if (csEl.textContent !== b) csEl.textContent = b;
@@ -365,7 +347,7 @@
     if (now - lastTap < GAP) {
       lastTap = 0; delete pad.dataset.armed; clearTimeout(armT); advance();
     } else {
-      lastTap = now; pad.dataset.armed = ""; hintEl.textContent = "한 번 더 탭";
+      lastTap = now; pad.dataset.armed = ""; hintEl.textContent = "Tap again";
       clearTimeout(armT);
       armT = setTimeout(() => { delete pad.dataset.armed; hintEl.textContent = hintFor(); }, GAP);
     }
@@ -387,72 +369,83 @@
     });
   }
 
-  function endSession() {
-    const now = Date.now();
-    if (s.phase === "work") s.sets.push({ n: s.set, started_at: iso(s.t0), ended_at: iso(now), duration_ms: now - s.t0 });
-    // A break still running at the end is the cool-down after the last set and isn't kept.
-    const ex = findEx(s.ex.id);
-    const record = {
-      id: uid(),
-      exercise_id: ex.id,
-      exercise_name: ex.name,
-      body_part: ex.part,
-      equipment: ex.equip,
-      started_at: iso(s.startedAt),
-      ended_at: iso(now),
-      duration_ms: now - s.startedAt,
-      set_count: s.sets.length,
-      sets: s.sets,
-      breaks: s.breaks,
-      synced: false
-    };
-    const h = loadHistory(); h.unshift(record); saveHistory(h);
-    if (window.GTSync) window.GTSync.sync();
-    s = fresh(); save();
-    go("back", () => renderList(ex.part));
-    openSheet(record);
+  /* ---------- End modal ---------- */
+  const modal = $("endModal");
+  let endAt = 0;
+  const avg = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0;
+  function setsUntil(now) {
+    return s.phase === "work"
+      ? s.sets.concat({ n: s.set, started_at: iso(s.t0), ended_at: iso(now), duration_ms: now - s.t0 })
+      : s.sets.slice();
   }
-  confirmable(endBtn, "끝내기", "한 번 더 누르면 저장", endSession);
+  function openEnd() {
+    endAt = Date.now();
+    const sets = setsUntil(endAt);
+    $("endEx").textContent = s.ex.name;
+    $("endSummary").innerHTML = `
+      <div><small>SETS</small><span>${sets.length}</span></div>
+      <div><small>TOTAL</small><span>${fmtShort(endAt - s.startedAt)}</span></div>
+      <div><small>AVG REST</small><span>${fmtShort(avg(s.breaks.map(b => b.duration_ms)))}</span></div>`;
+    modal.hidden = false;
+    $("saveBtn").focus({ preventScroll: true });
+  }
+  const closeEnd = () => { modal.hidden = true; };
+  function finish(keep) {
+    const ex = findEx(s.ex.id);
+    // A break still running at the end is the cool-down after the last set and isn't kept.
+    if (keep) {
+      const sets = setsUntil(endAt);
+      const record = {
+        id: uid(),
+        exercise_id: ex.id,
+        exercise_name: ex.name,
+        body_part: ex.part,
+        equipment: ex.equip,
+        started_at: iso(s.startedAt),
+        ended_at: iso(endAt),
+        duration_ms: endAt - s.startedAt,
+        set_count: sets.length,
+        sets,
+        breaks: s.breaks,
+        synced: false
+      };
+      const h = loadHistory(); h.unshift(record); saveHistory(h);
+      if (window.GTSync) window.GTSync.sync();
+    }
+    s = fresh(); save();
+    closeEnd();
+    go("back", () => renderList(ex.part));
+    toast(keep ? `Saved · ${ex.name}` : "Workout discarded");
+  }
+  confirmable(endBtn, "End", "Tap again", openEnd);
+  $("saveBtn").addEventListener("click", () => finish(true));
+  $("discardBtn").addEventListener("click", () => finish(false));
+  $("keepBtn").addEventListener("click", closeEnd);
+  modal.addEventListener("click", e => { if (e.target === modal) closeEnd(); });
+  modal.addEventListener("pointerup", e => e.stopPropagation());
 
   /* ---------- Sheet ---------- */
-  const sheet = $("sheet"), summaryEl = $("summary"), histEl = $("hist"), copyBtn = $("copyBtn");
-  const avg = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0;
-  const dateLabel = t => { const d = new Date(t); return `${d.getMonth() + 1}월 ${d.getDate()}일 ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
+  const sheet = $("sheet"), histEl = $("hist");
+  const dateLabel = t => new Date(t).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
 
   function renderHist() {
     const h = loadHistory();
-    if (!h.length) { histEl.innerHTML = `<div class="empty">아직 저장된 기록이 없어요. 운동을 마치면 끝내기를 두 번 누르세요.</div>`; return; }
+    if (!h.length) { histEl.innerHTML = `<div class="empty">No workouts saved yet. Finish an exercise with End and choose Save.</div>`; return; }
     histEl.innerHTML = h.map(r => `
       <div class="row">
-        <span class="when">${r.exercise_name || "운동"}<small>${dateLabel(r.started_at)}${r.body_part && PARTS[r.body_part] ? " · " + PARTS[r.body_part].name : ""}</small></span>
-        <span class="meta">${r.set_count}세트</span>
+        <span class="when">${(findEx(r.exercise_id) || {}).name || r.exercise_name || "Workout"}<small>${dateLabel(r.started_at)}${r.body_part && PARTS[r.body_part] ? " · " + PARTS[r.body_part].name : ""}</small></span>
+        <span class="meta">${r.set_count} sets</span>
         <span class="meta">${fmtShort(r.duration_ms)}</span>
-        <span class="rests">휴식 ${r.breaks.map(b => fmt(b.duration_ms)).join(" · ") || "없음"}</span>
+        <span class="rests">${r.breaks.length ? "Rest " + r.breaks.map(b => fmt(b.duration_ms)).join(" · ") : "No rests"}</span>
       </div>`).join("");
   }
-  function openSheet(record) {
-    if (record) {
-      $("sheetTitle").textContent = `${record.exercise_name} 저장 완료`;
-      summaryEl.hidden = false;
-      summaryEl.innerHTML = `
-        <div><small>세트</small><span>${record.set_count}</span></div>
-        <div><small>총 시간</small><span>${fmtShort(record.duration_ms)}</span></div>
-        <div><small>평균 휴식</small><span>${fmtShort(avg(record.breaks.map(b => b.duration_ms)))}</span></div>`;
-    } else {
-      $("sheetTitle").textContent = "운동 기록";
-      summaryEl.hidden = true;
-    }
+  function openSheet() {
     renderHist();
     sheet.hidden = false;
   }
   $("closeSheet").addEventListener("click", () => sheet.hidden = true);
   sheet.addEventListener("click", e => { if (e.target === sheet) sheet.hidden = true; });
-  copyBtn.addEventListener("click", async () => {
-    try { await navigator.clipboard.writeText(JSON.stringify(loadHistory(), null, 2)); copyBtn.textContent = "복사됨"; }
-    catch (e) { copyBtn.textContent = "복사 안 됨"; }
-    setTimeout(() => copyBtn.textContent = "JSON 복사", 1600);
-  });
-  confirmable($("clearBtn"), "전체 삭제", "한 번 더 누르면 삭제", async () => {
+  confirmable($("clearBtn"), "Clear all", "Tap again to clear", async () => {
     if (window.GTSync) await window.GTSync.clearAll(); else saveHistory([]);
     renderHist();
   });
@@ -461,19 +454,20 @@
   const syncNote = $("syncNote");
   if (window.GTSync) {
     window.GTSync.onChange(st => {
-      const pend = st.pending ? ` · 대기 ${st.pending}개` : "";
+      const pend = st.pending ? `${st.pending} waiting to sync` : "";
       const text = {
-        ok: st.pending ? `클라우드 동기화 대기${pend}` : "클라우드에 동기화됨",
-        syncing: "동기화 중…",
-        offline: `오프라인 · 이 기기에 저장됨${pend}`,
-        error: `동기화 안 됨: ${st.message}${pend}`,
-        off: `이 기기에만 저장됨${pend}`
+        ok: pend,
+        syncing: "",
+        offline: st.pending ? `Offline · ${pend}` : "",
+        error: `Not synced: ${st.message}${pend ? " · " + pend : ""}`,
+        off: pend
       }[st.status] || "";
       syncNote.textContent = text;
+      syncNote.hidden = !text;
       syncNote.style.color = st.status === "error" ? "var(--warm)" : "";
       if (!sheet.hidden && st.status === "ok") renderHist();
       if (view === "list" && st.status === "ok") {
-        // refresh "최근" labels after a pull
+        // refresh "Last" labels after a pull
         document.querySelectorAll("[data-ex] .last").forEach(el => {
           const id = el.closest("[data-ex]").dataset.ex;
           if (!(active() && s.ex.id === id)) el.textContent = lastFor(id);
