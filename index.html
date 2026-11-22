@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Good Timer</title>
+<meta name="theme-color" content="#0b0f12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Good Timer">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400&family=IBM+Plex+Sans+KR:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="glow" aria-hidden="true"></div>
+
+<!-- Home: body parts -->
+<section class="view" id="home">
+  <div class="bar">
+    <span class="eyebrow">WORKOUT</span>
+    <button class="pill" data-history type="button">기록</button>
+  </div>
+  <h1>오늘은 어디를 할까요</h1>
+  <p class="lede">부위를 고르면 대표 운동이 나와요.</p>
+  <div id="resumeSlot"></div>
+  <div class="parts" id="parts"></div>
+</section>
+
+<!-- Exercise list -->
+<section class="view" id="list" hidden>
+  <div class="bar">
+    <button class="back" id="listBack" type="button"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 5 8l5 5"/></svg>부위 선택</button>
+    <button class="pill" data-history type="button">기록</button>
+  </div>
+  <div class="list-head">
+    <div class="fig" id="listFig"></div>
+    <div>
+      <h1 id="listTitle"></h1>
+      <div class="eyebrow" id="listSub"></div>
+    </div>
+  </div>
+  <div class="exs" id="exs"></div>
+</section>
+
+<!-- Timer -->
+<section class="view" id="pad" hidden role="button" tabindex="0" aria-label="두 번 탭해서 세트 / 브레이크 전환">
+  <div class="bar">
+    <div class="ex-title">
+      <button class="back" id="timerBack" type="button"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 5 8l5 5"/></svg><span id="exName"></span></button>
+      <span class="eyebrow" id="setLabel">SET 1</span>
+    </div>
+    <div class="actions">
+      <button class="pill" data-history type="button">기록</button>
+      <button class="pill" id="endBtn" type="button">끝내기</button>
+    </div>
+  </div>
+  <div class="center">
+    <div id="time"><span id="mm">0:00</span><span class="cs" id="cs">.00</span></div>
+    <div class="status" id="status" aria-live="polite"></div>
+  </div>
+  <div class="foot">
+    <div id="log"></div>
+    <div class="hint" id="hint">세트가 끝나면 두 번 탭</div>
+  </div>
+</section>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="sheet-head">
+      <h2 id="sheetTitle">운동 기록</h2>
+      <button class="pill" id="closeSheet" type="button">닫기</button>
+    </div>
+    <div class="summary" id="summary" hidden></div>
+    <div class="list" id="hist"></div>
+    <div class="note" id="syncNote">기록은 이 기기에 먼저 저장되고 클라우드로 동기화돼요.</div>
+    <div class="sheet-actions">
+      <button class="pill" id="clearBtn" type="button">전체 삭제</button>
+      <button class="pill" id="copyBtn" type="button">JSON 복사</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="/config.js"></script>
+<script src="/sync.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>
