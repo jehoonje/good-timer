@@ -131,7 +131,43 @@ h1 {
   font-size: clamp(30px, 8.5vw, 46px); letter-spacing: -.015em; line-height: 1.12;
   margin: 30px 0 8px; text-wrap: balance;
 }
-#home .bar { margin-bottom: 22px; }
+#home .bar { margin-bottom: 6px; }
+
+/* ---------- Today HUD ---------- */
+.dots {
+  position: fixed; inset: 0; pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, .07) .8px, transparent 1.2px);
+  background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(75% 60% at 50% 40%, black, transparent);
+  mask-image: radial-gradient(75% 60% at 50% 40%, black, transparent);
+}
+.today { display: flex; flex-direction: column; gap: 14px; margin: 14px 0 18px; animation: rise .7s var(--ease) both; }
+.today-top { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.date { display: flex; align-items: baseline; gap: 10px; }
+.dnum { font-family: var(--num); font-weight: 200; font-size: clamp(46px, 14vw, 68px); letter-spacing: -.04em; line-height: .9; font-variant-numeric: tabular-nums; }
+.dday { font-family: var(--mono); font-size: 10.5px; letter-spacing: .18em; color: var(--dim); }
+.stats { display: flex; gap: 18px; padding-bottom: 2px; }
+.stats div { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.stats small, .summary small { font-family: var(--mono); font-size: 9px; letter-spacing: .16em; color: var(--faint); }
+.stats span { font-family: var(--num); font-weight: 300; font-size: 19px; font-variant-numeric: tabular-nums; }
+.week {
+  display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px;
+  padding: 12px 10px 10px; border-radius: 20px;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(22px) saturate(150%); backdrop-filter: blur(22px) saturate(150%);
+  box-shadow: var(--sheen), var(--lift);
+}
+.day { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.day i {
+  display: flex; flex-direction: column-reverse; gap: 3px;
+  width: 100%; max-width: 24px; height: 30px; padding: 3px; box-sizing: border-box;
+  border-radius: 8px; background: rgba(255, 255, 255, .03);
+}
+.day b { display: block; height: 5px; border-radius: 3px; background: var(--pt); box-shadow: 0 0 8px color-mix(in oklab, var(--pt) 70%, transparent); opacity: .85; }
+.day span { font-family: var(--mono); font-size: 9.5px; letter-spacing: .1em; color: var(--faint); }
+.day.is-today i { background: rgba(255, 255, 255, .08); }
+.day.is-today span { color: var(--ink); }
+.day.future { opacity: .4; }
 
 /* entry motion for repeated items */
 @keyframes rise {
@@ -176,7 +212,8 @@ h1 {
   display: flex; align-items: center; justify-content: center;
 }
 .part .fig svg { height: 100%; width: auto; overflow: visible; }
-.part .label { position: relative; display: flex; flex-direction: column; gap: 3px; padding: 0 4px; }
+.part .label { position: relative; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 0 4px; }
+.part .pmeta { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; color: var(--dim); }
 .part .name { font-size: 19px; font-weight: 600; letter-spacing: -.01em; }
 .part .meta { font-size: 10px; letter-spacing: .16em; color: var(--pt); margin-top: 2px; }
 .part .count { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; color: var(--dim); }
@@ -203,6 +240,9 @@ h1 {
 .exs { display: grid; grid-template-columns: repeat(auto-fill, minmax(152px, 1fr)); gap: 10px; }
 .ex { padding: 15px; display: flex; flex-direction: column; gap: 16px; min-width: 0; border-radius: 20px; }
 .ex .last:empty { display: none; }
+.ex-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.ex .eq { font-family: var(--mono); font-size: 9px; letter-spacing: .14em; color: var(--faint); padding-top: 2px; }
+#listMeta { margin-top: 8px; }
 .ex .glyph {
   width: 38px; height: 38px; border-radius: 12px;
   display: flex; align-items: center; justify-content: center;
@@ -253,6 +293,9 @@ h1 {
   gap: clamp(14px, 4vw, 34px);
   min-width: 0; min-height: 0;
 }
+.readout { position: relative; display: flex; flex-direction: column; gap: 10px; }
+.readout .meta { font-family: var(--mono); font-size: 10.5px; letter-spacing: .16em; color: var(--dim); min-height: 1.2em; font-variant-numeric: tabular-nums; padding-left: .3em; }
+body:is([data-phase="work"]) #metaTop { color: color-mix(in oklab, var(--red) 50%, var(--dim)); }
 #time {
   position: relative;
   font-family: var(--num); font-weight: 200;

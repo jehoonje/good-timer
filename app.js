@@ -188,9 +188,11 @@
         <div class="fig">${figure(k)}</div>
         <div class="label">
           <div class="name">${PARTS[k].name}</div>
+          <span class="pmeta">${lastPart(k)}</span>
         </div>
       </button>`).join("");
     renderResume();
+    renderToday();
     setTone(active() ? s.ex.part : null);
     show("home");
   }
@@ -201,6 +203,40 @@
     const ex = findEx(s.ex.id);
     slot.innerHTML = `<button class="resume rise" type="button" id="resumeBtn" style="--tone:var(${PARTS[ex.part].tone})">
       <span><i class="dot"></i><b>${ex.name}</b></span><span class="t" id="resumeT"></span></button>`;
+  }
+
+  const EQ_EN = { barbell: "BARBELL", dumbbell: "DUMBBELL", cable: "CABLE", machine: "MACHINE", body: "BODYWEIGHT" };
+  const mmdd = t => { const d = new Date(t); return `${d.getMonth() + 1}/${d.getDate()}`; };
+  const fmtDur = ms => { const m = Math.round(ms / 60000); return m < 60 ? `${m}m` : `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, "0")}m`; };
+  function lastPart(part) {
+    const r = loadHistory().find(r => r.body_part === part);
+    return r ? mmdd(r.started_at) : "—";
+  }
+  function weekStart(d = new Date()) {
+    const x = new Date(d); x.setHours(0, 0, 0, 0); x.setDate(x.getDate() - (x.getDay() + 6) % 7); return x;
+  }
+  function renderToday() {
+    const h = loadHistory(), now = new Date(), ws = weekStart(now);
+    const inWeek = h.filter(r => new Date(r.started_at) >= ws);
+    const sets = inWeek.reduce((a, r) => a + (r.set_count || 0), 0);
+    const dur = inWeek.reduce((a, r) => a + (r.duration_ms || 0), 0);
+    const cols = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(ws); d.setDate(ws.getDate() + i);
+      const key = d.toDateString(), isToday = key === now.toDateString();
+      const parts = [...new Set(h.filter(r => new Date(r.started_at).toDateString() === key).map(r => r.body_part))].filter(p => PARTS[p]);
+      return `<div class="day${isToday ? " is-today" : ""}${d > now && !isToday ? " future" : ""}">
+        <i>${parts.map(p => `<b style="--pt:var(${PARTS[p].tone})"></b>`).join("")}</i><span>${"MTWTFSS"[i]}</span></div>`;
+    }).join("");
+    $("today").innerHTML = `
+      <div class="today-top">
+        <div class="date"><span class="dnum">${String(now.getMonth() + 1).padStart(2, "0")}.${String(now.getDate()).padStart(2, "0")}</span><span class="dday">${["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"][now.getDay()]}</span></div>
+        <div class="stats">
+          <div><small>SESSIONS</small><span>${inWeek.length}</span></div>
+          <div><small>SETS</small><span>${sets}</span></div>
+          <div><small>TIME</small><span>${fmtDur(dur)}</span></div>
+        </div>
+      </div>
+      <div class="week">${cols}</div>`;
   }
 
   function lastFor(id) {
@@ -217,9 +253,10 @@
     $("listFig").innerHTML = figure(part);
     $("listFig").style.setProperty("--pt", `var(${P.tone})`);
     $("listTitle").textContent = P.name;
+    $("listMeta").textContent = `${P.en} · ${String(EX[part].length).padStart(2, "0")} · LAST ${lastPart(part)}`;
     $("exs").innerHTML = EX[part].map(([id, name, en, eq, target], i) => `
       <button class="card ex rise${active() && s.ex.id === id ? " active" : ""}" type="button" data-ex="${id}" style="--pt:var(${P.tone});--i:${i}">
-        <span class="glyph"><svg viewBox="0 0 24 24">${EQUIP[eq][1]}</svg></span>
+        <span class="ex-top"><span class="glyph"><svg viewBox="0 0 24 24">${EQUIP[eq][1]}</svg></span><span class="eq">${EQ_EN[eq]}</span></span>
         <span class="name">${name}</span>
         <span class="last">${active() && s.ex.id === id ? "●" : lastFor(id)}</span>
       </button>`).join("");
@@ -294,7 +331,8 @@
     const idle = s.phase === "idle";
     $("timerBack").hidden = !idle;
     $("startBtn").hidden = !idle;
-    [$("time"), statusEl, $("foot"), endBtn].forEach(el => el.hidden = idle);
+    [$("readout"), statusEl, $("foot"), endBtn].forEach(el => el.hidden = idle);
+    renderMetaBot();
   }
 
   /* ---------- 3D start button ---------- */
@@ -322,13 +360,19 @@
     save(); keepAwake();
     startBtn.classList.remove("launch", "pressed");
     renderStatus();
-    if (!rm) [$("time"), statusEl, $("foot")].forEach((el, i) => el.animate(
+    if (!rm) [$("readout"), statusEl, $("foot")].forEach((el, i) => el.animate(
       [{ opacity: 0, transform: "translateY(8px) scale(.96)", filter: "blur(10px)" }, { opacity: 1, transform: "none", filter: "none" }],
       { duration: 700, delay: i * 90, easing: "cubic-bezier(.2,.7,.1,1)", fill: "backwards" }));
     starting = false;
   }
 
-  const mmEl = $("mm"), csEl = $("cs");
+  const mmEl = $("mm"), csEl = $("cs"), metaTop = $("metaTop");
+  function renderMetaBot() {
+    let t = "";
+    if (s.phase === "rest") { const st = s.sets[s.sets.length - 1]; if (st && st.duration_ms != null) t = "SET " + fmt(st.duration_ms); }
+    else if (s.phase === "work") { const br = s.breaks[s.breaks.length - 1]; if (br) t = "REST " + fmt(br.duration_ms); }
+    $("metaBot").textContent = t;
+  }
   function frame() {
     const now = Date.now();
     if (view === "timer") {
@@ -336,6 +380,8 @@
       const [a, b] = split(ms);
       if (mmEl.textContent !== a) mmEl.textContent = a;
       if (csEl.textContent !== b) csEl.textContent = b;
+      const tot = s.startedAt && s.phase !== "idle" ? "TOTAL " + fmtShort(now - s.startedAt) : "";
+      if (metaTop.textContent !== tot) metaTop.textContent = tot;
     } else if (view === "home") {
       const r = $("resumeT");
       if (r && active()) r.textContent = fmtShort(now - s.t0);

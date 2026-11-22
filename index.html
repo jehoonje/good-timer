@@ -21,6 +21,7 @@
 <body>
 <div class="glow" aria-hidden="true"><i></i><i></i><i></i></div>
 <div class="grain" aria-hidden="true"></div>
+<div class="dots" aria-hidden="true"></div>
 
 <!-- Home: body parts -->
 <section class="view" id="home">
@@ -28,6 +29,7 @@
     <span class="eyebrow">GOOD TIMER</span>
     <button class="pill" data-history type="button">기록</button>
   </div>
+  <div class="today" id="today"></div>
   <div id="resumeSlot"></div>
   <div class="parts" id="parts"></div>
 </section>
@@ -41,6 +43,7 @@
     <div class="fig" id="listFig"></div>
     <div>
       <h1 id="listTitle"></h1>
+      <div class="eyebrow" id="listMeta"></div>
     </div>
   </div>
   <div class="exs" id="exs"></div>
@@ -65,7 +68,11 @@
       <span class="rim" aria-hidden="true"></span>
       <span class="face"><span class="lbl">START</span></span>
     </button>
-    <div id="time"><span id="mm">0:00</span><span class="cs" id="cs">.00</span></div>
+    <div class="readout" id="readout">
+      <div class="meta" id="metaTop"></div>
+      <div id="time"><span id="mm">0:00</span><span class="cs" id="cs">.00</span></div>
+      <div class="meta" id="metaBot"></div>
+    </div>
     <div class="status" id="status" aria-live="polite"></div>
   </div>
   <div class="foot" id="foot">
