@@ -142,7 +142,7 @@ body:is([data-phase="work"], [data-phase="idle"]) .status .line.now::before { ba
 .hint { font-family: var(--num); letter-spacing: .14em; text-transform: uppercase; font-size: 11px; color: var(--dim); }
 
 #pad::after {
-  background: radial-gradient(circle 70vmax at var(--tx, 50%) var(--ty, 50%), rgba(150, 185, 255, .26), rgba(110, 160, 255, .09) 35%, transparent 70%);
+  background: radial-gradient(circle 70vmax at var(--tx, 50%) var(--ty, 50%), rgba(150, 185, 255, .11), rgba(110, 160, 255, .04) 35%, transparent 70%);
   transform: scale(.9); transform-origin: var(--tx, 50%) var(--ty, 50%);
   transition: opacity .4s ease, transform .5s cubic-bezier(.2, .8, .2, 1);
 }
@@ -269,3 +269,18 @@ body[data-phase="rest"] #time { text-shadow: none; }
 .start::after { text-shadow: none; color: var(--dim); letter-spacing: .3em; }
 .sheet-head h2, .modal-card h2 { text-shadow: none; }
 .toast { box-shadow: inset 0 0 0 1px rgba(140, 170, 255, .2); }
+
+/* ---------- Smoothness: compositor-only motion (opacity + transform), no animated blur ---------- */
+.glass, .card, .pill, .back, .resume, .toast { -webkit-backdrop-filter: none; backdrop-filter: none; }
+@keyframes vt-bloom-in  { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes vt-bloom-out { from { opacity: 1; } to { opacity: 0; transform: translateY(-8px); } }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: .45s; animation-timing-function: cubic-bezier(.25, .8, .25, 1); }
+::view-transition-group(hero-fig) { animation-duration: .6s; animation-timing-function: cubic-bezier(.3, .8, .2, 1); }
+::view-transition-old(hero-fig), ::view-transition-new(hero-fig) { animation-duration: .6s; animation-timing-function: cubic-bezier(.3, .8, .2, 1); height: 100%; object-fit: contain; }
+.view.enter, .view.enter-back { animation: vt-bloom-in .45s cubic-bezier(.25, .8, .25, 1) both; }
+@keyframes rise-ps2 { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.rise { animation-name: rise-ps2; animation-duration: .55s; animation-timing-function: cubic-bezier(.25, .8, .25, 1); will-change: transform, opacity; }
+@keyframes appear { from { opacity: 0; transform: scale(.92) translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes launch { to { opacity: 0; transform: scale(.9); } }
+.start { animation: appear .7s cubic-bezier(.25, .8, .25, 1) both .1s; will-change: transform, opacity; }
+.start .halo { will-change: transform, opacity; }

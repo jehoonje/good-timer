@@ -330,7 +330,7 @@
     startBtn.classList.remove("launch", "pressed");
     renderStatus();
     if (!rm) [$("time"), statusEl, $("foot")].forEach((el, i) => el.animate(
-      [{ opacity: 0, transform: "translateY(8px) scale(.96)", filter: "blur(10px)" }, { opacity: 1, transform: "none", filter: "none" }],
+      [{ opacity: 0, transform: "translateY(10px) scale(.98)" }, { opacity: 1, transform: "none" }],
       { duration: 700, delay: i * 90, easing: "cubic-bezier(.2,.7,.1,1)", fill: "backwards" }));
     starting = false;
     announce();
@@ -438,8 +438,8 @@
     const t = $("time");
     if (!ghost) return;
     const chip = $("log").lastElementChild;
-    t.animate([{ opacity: 0, transform: "translateY(10px) scale(.97)", filter: "blur(6px)" },
-               { opacity: 1, transform: "none", filter: "none" }],
+    t.animate([{ opacity: 0, transform: "translateY(10px) scale(.97)" },
+               { opacity: 1, transform: "none" }],
               { duration: 520, delay: 220, easing: "cubic-bezier(.2,.7,.1,1)", fill: "backwards" });
     if (!chip) { ghost.g.remove(); return; }
     const em = chip.querySelector("em");
@@ -448,9 +448,9 @@
     const k = to.width / from.width;
     const dx = to.left - from.left, dy = to.top + to.height / 2 - (from.top + from.height * k / 2);
     const fly = ghost.g.animate([
-      { transform: "translate(0,0) scale(1)", opacity: 1, filter: "blur(0)" },
-      { transform: `translate(${dx * .55}px, ${dy * .5}px) scale(${(1 + k) / 2})`, opacity: .9, filter: "blur(.5px)", offset: .55 },
-      { transform: `translate(${dx}px, ${dy}px) scale(${k})`, opacity: 0, filter: "blur(1px)" }
+      { transform: "translate(0,0) scale(1)", opacity: 1 },
+      { transform: `translate(${dx * .55}px, ${dy * .5}px) scale(${(1 + k) / 2})`, opacity: .9, offset: .55 },
+      { transform: `translate(${dx}px, ${dy}px) scale(${k})`, opacity: 0 }
     ], { duration: 680, easing: "cubic-bezier(.55,0,.2,1)", fill: "forwards" });
     chip.animate([{ opacity: 0, transform: "scale(.85)" }, { opacity: 1, transform: "scale(1.06)", offset: .6 }, { opacity: 1, transform: "scale(1)" }],
                  { duration: 420, delay: 520, easing: "cubic-bezier(.2,.7,.1,1)", fill: "backwards" })
