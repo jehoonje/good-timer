@@ -141,7 +141,12 @@ body:is([data-phase="work"], [data-phase="idle"]) .status .line.now::before { ba
 #log .w b { color: var(--red); }
 .hint { font-family: var(--num); letter-spacing: .14em; text-transform: uppercase; font-size: 11px; color: var(--dim); }
 
-#pad::after { background: radial-gradient(60% 50% at 50% 50%, rgba(110, 160, 255, .1), transparent 70%); }
+#pad::after {
+  background: radial-gradient(circle 70vmax at var(--tx, 50%) var(--ty, 50%), rgba(150, 185, 255, .26), rgba(110, 160, 255, .09) 35%, transparent 70%);
+  transform: scale(.9); transform-origin: var(--tx, 50%) var(--ty, 50%);
+  transition: opacity .4s ease, transform .5s cubic-bezier(.2, .8, .2, 1);
+}
+#pad[data-armed]::after { transform: scale(1); transition-duration: .12s, .35s; }
 
 /* Fly-by label: neon with RGB fringe */
 #stageText {

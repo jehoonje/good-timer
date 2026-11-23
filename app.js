@@ -462,6 +462,8 @@
   let lastTap = 0, armT = null;
   pad.addEventListener("pointerup", e => {
     if (e.target.closest("button") || s.phase === "idle") return;
+    pad.style.setProperty("--tx", e.clientX + "px");   // tap glow spreads from the finger
+    pad.style.setProperty("--ty", e.clientY + "px");
     const now = performance.now();
     if (now - lastTap < GAP) {
       lastTap = 0; delete pad.dataset.armed; clearTimeout(armT); advance();
