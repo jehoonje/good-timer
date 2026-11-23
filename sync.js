@@ -1,21 +1,33 @@
-// Supabase sync for finished sessions.
-// Local-first: every session is written to localStorage with synced:false,
-// then pushed to public.gt_sessions under an anonymous Supabase user.
+// Supabase sync for finished sessions, with access-code accounts.
+// A device signs in anonymously, then redeems an access code; everyone signed in to the same
+// code shares one history (RLS on public.gt_sessions is keyed by account_code).
+// Local-first: sessions are written to this device's per-code cache with synced:false, then pushed.
 (() => {
-  const HKEY = "set-break-sessions-v1";
+  const BASE = "set-break-sessions-v1";        // legacy single-user cache key
+  const CODE_KEY = "gt-code";
   const cfg = window.GT_CONFIG || {};
   const listeners = new Set();
   const state = { status: "off", message: "", pending: 0 };
 
-  const load = () => { try { return JSON.parse(localStorage.getItem(HKEY)) || []; } catch (e) { return []; } };
-  const store = h => { try { localStorage.setItem(HKEY, JSON.stringify(h)); } catch (e) {} };
+  const ls = {
+    get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} },
+    del: k => { try { localStorage.removeItem(k); } catch (e) {} }
+  };
+  const normalize = c => String(c || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const code = () => ls.get(CODE_KEY);
+  const key = () => (code() ? `${BASE}:${code()}` : BASE);
+  window.GTStore = { key, code, normalize };
+
+  const load = () => { try { return JSON.parse(ls.get(key())) || []; } catch (e) { return []; } };
+  const store = h => ls.set(key(), JSON.stringify(h));
   const emit = () => {
     state.pending = load().filter(r => !r.synced).length;
     listeners.forEach(fn => { try { fn({ ...state }); } catch (e) {} });
   };
   const set = (status, message = "") => { state.status = status; state.message = message; emit(); };
 
-  let client = null, ready = null, busy = false;
+  let client = null, ready = null, busy = false, linked = null;
 
   function init() {
     if (ready) return ready;
@@ -41,8 +53,20 @@
     return ready;
   }
 
+  // Make sure this device is linked to the stored code (e.g. after its anonymous session was renewed).
+  async function ensureLinked() {
+    const c = code();
+    if (!c || linked === c) return !!c;
+    const { data, error } = await client.rpc("gt_redeem", { p_code: c });
+    if (error) throw error;
+    if (data !== true) { signOut(); listeners.forEach(fn => { try { fn({ ...state, status: "revoked" }); } catch (e) {} }); return false; }
+    linked = c;
+    return true;
+  }
+
   const toRow = r => ({
     id: r.id,
+    account_code: code(),
     exercise_id: r.exercise_id || "unknown",
     exercise_name: r.exercise_name || "Workout",
     body_part: r.body_part || "back",
@@ -78,12 +102,13 @@
   }
 
   async function sync() {
-    if (busy) return;
+    if (busy || !code()) return;
     if (!navigator.onLine) { set("offline", "offline"); return; }
     busy = true;
     set("syncing");
     try {
       if (!(await init())) return;
+      if (!(await ensureLinked())) return;
       await push();
       await pull();
       set("ok");
@@ -94,13 +119,32 @@
     }
   }
 
+  // Check a code with the server and sign this device in to it. Returns true / false; throws when offline.
+  async function redeem(input) {
+    const c = normalize(input);
+    if (c.length !== 8) return false;
+    if (!navigator.onLine) throw new Error("offline");
+    if (!(await init())) throw new Error(state.message || "sign-in failed");
+    const { data, error } = await client.rpc("gt_redeem", { p_code: c });
+    if (error) throw error;
+    if (data !== true) return false;
+    // First sign-in on this device: carry over the history kept before codes existed.
+    const legacy = ls.get(BASE);
+    if (legacy && !ls.get(`${BASE}:${c}`)) { ls.set(`${BASE}:${c}`, legacy); ls.del(BASE); }
+    ls.set(CODE_KEY, c);
+    linked = c;
+    sync();
+    return true;
+  }
+
+  function signOut() { ls.del(CODE_KEY); linked = null; emit(); }
+
   async function clearAll() {
     store([]);
     emit();
     try {
-      if (navigator.onLine && (await init())) {
-        const { data } = await client.auth.getUser();
-        if (data && data.user) await client.from(cfg.table).delete().eq("user_id", data.user.id);
+      if (navigator.onLine && code() && (await init()) && (await ensureLinked())) {
+        await client.from(cfg.table).delete().eq("account_code", code());
       }
     } catch (e) { set("error", "couldn't clear cloud history"); return; }
     set(state.status === "error" ? "error" : "ok");
@@ -110,7 +154,7 @@
   document.addEventListener("visibilitychange", () => { if (!document.hidden) sync(); });
 
   window.GTSync = {
-    sync, clearAll,
+    sync, clearAll, redeem, signOut,
     onChange(fn) { listeners.add(fn); fn({ ...state, pending: load().filter(r => !r.synced).length }); return () => listeners.delete(fn); }
   };
   sync();

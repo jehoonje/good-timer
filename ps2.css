@@ -472,3 +472,39 @@ body::before, body::after {
 #log { overflow: hidden; -webkit-mask-image: none; mask-image: none; justify-content: center; padding: 2px 0; }
 #log > :first-child, #log > :last-child { margin: 0; }
 #log .more { color: var(--dim); background: none; box-shadow: inset 0 0 0 1px rgba(140, 170, 255, .1); }
+
+/* =========================================================================
+   Access code gate — a still, centered sign-in: wordmark, one code field, one arrow.
+   ========================================================================= */
+#gate { display: grid; place-items: center; min-height: 100vh; min-height: 100lvh; padding-bottom: 0; }
+#gate[hidden] { display: none; }
+.gate { width: min(100%, 340px); display: flex; flex-direction: column; align-items: center; gap: 18px; margin-top: -6vh; }
+.gate-mark { font-family: var(--text); font-weight: 500; font-size: 30px; letter-spacing: .42em; padding-left: .42em; color: var(--ink); margin-bottom: 28px; }
+.gate-label { font-family: var(--num); font-size: 11px; letter-spacing: .3em; padding-left: .3em; color: var(--dim); }
+.gate-row { position: relative; width: 100%; display: flex; align-items: center; gap: 10px; }
+.gate input {
+  flex: 1; min-width: 0; height: 52px; box-sizing: border-box;
+  font-family: var(--num); font-size: 24px; letter-spacing: .28em; text-align: center; text-transform: uppercase;
+  color: var(--ink); caret-color: var(--cyan);
+  background: none; border: 0; border-bottom: 1px solid rgba(140, 170, 255, .28); border-radius: 0;
+  padding: 0 0 0 .28em; outline: none; transition: border-color .2s;
+  -webkit-user-select: text; user-select: text;
+}
+.gate input::placeholder { color: rgba(140, 170, 255, .22); }
+.gate input:focus { border-bottom-color: rgba(160, 190, 255, .7); }
+.gate.bad input { border-bottom-color: rgba(255, 77, 99, .8); animation: gate-shake .32s; }
+@keyframes gate-shake { 25% { transform: translateX(-6px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-3px); } }
+.gate-go {
+  width: 44px; height: 44px; flex: none; border-radius: 50%; padding: 0; display: grid; place-items: center;
+  background: none; color: var(--dim); box-shadow: inset 0 0 0 1px rgba(200, 215, 255, .2);
+  cursor: pointer; transition: color .2s, box-shadow .2s, background .2s;
+}
+.gate.ready .gate-go { color: var(--ink); box-shadow: inset 0 0 0 1px rgba(160, 190, 255, .7); background: rgba(110, 160, 255, .12); }
+.gate.busy .gate-go svg { animation: gate-wait 1s linear infinite; }
+@keyframes gate-wait { 50% { opacity: .25; } }
+.gate-go svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.gate-go:focus-visible { outline: 1px solid var(--cyan); outline-offset: 3px; }
+.gate-msg { min-height: 16px; font-family: var(--num); font-size: 12px; letter-spacing: .08em; color: var(--dim); text-align: center; }
+.gate.bad .gate-msg { color: #ff8796; }
+.sheet-actions .pill.quiet { margin-right: auto; }
+@media (prefers-reduced-motion: reduce) { .gate.bad input, .gate.busy .gate-go svg { animation: none !important; } }

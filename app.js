@@ -131,8 +131,9 @@
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} };
   const active = () => s.ex && s.phase !== "idle";
 
-  const loadHistory = () => { try { return JSON.parse(localStorage.getItem(HKEY)) || []; } catch (e) { return []; } };
-  const saveHistory = h => { try { localStorage.setItem(HKEY, JSON.stringify(h)); } catch (e) {} };
+  const histKey = () => (window.GTStore ? window.GTStore.key() : HKEY);   // per access-code cache
+  const loadHistory = () => { try { return JSON.parse(localStorage.getItem(histKey())) || []; } catch (e) { return []; } };
+  const saveHistory = h => { try { localStorage.setItem(histKey(), JSON.stringify(h)); } catch (e) {} };
 
   const split = ms => {
     ms = Math.max(0, ms);
@@ -149,6 +150,7 @@
 
   function show(v) {
     view = v;
+    $("gate").hidden = v !== "gate";
     $("home").hidden = v !== "home";
     $("list").hidden = v !== "list";
     $("pad").hidden = v !== "timer";
@@ -687,8 +689,48 @@
     });
   }
 
+  /* ---------- Access code ---------- */
+  const gateInput = $("gateInput"), gateMsg = $("gateMsg"), gateForm = $("gateForm");
+  const fmtCode = v => { const c = (window.GTStore ? window.GTStore.normalize(v) : v.toUpperCase()).slice(0, 8); return c.length > 4 ? c.slice(0, 4) + "-" + c.slice(4) : c; };
+  function showGate(msg = "") {
+    document.body.dataset.phase = "";
+    gateInput.value = ""; gateMsg.textContent = msg; gateForm.classList.remove("busy", "bad");
+    show("gate");
+    setTimeout(() => { try { gateInput.focus({ preventScroll: true }); } catch (e) {} }, 350);
+  }
+  gateInput.addEventListener("input", () => {
+    gateInput.value = fmtCode(gateInput.value);
+    gateForm.classList.remove("bad"); gateMsg.textContent = "";
+    gateForm.classList.toggle("ready", gateInput.value.length === 9);
+  });
+  gateForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    if (gateForm.classList.contains("busy")) return;
+    const v = gateInput.value;
+    if ((window.GTStore ? window.GTStore.normalize(v) : v).length !== 8) { gateForm.classList.add("bad"); gateMsg.textContent = "Codes have 8 characters."; return; }
+    gateForm.classList.add("busy"); gateMsg.textContent = "Checking…";
+    try {
+      const ok = await window.GTSync.redeem(v);
+      if (!ok) { gateForm.classList.remove("busy"); gateForm.classList.add("bad"); gateMsg.textContent = "That code isn't valid."; gateInput.select(); return; }
+      gateMsg.textContent = "";
+      gateInput.blur();
+      go("fwd", () => { s = fresh(); save(); renderHome(); });
+    } catch (err) {
+      gateForm.classList.remove("busy");
+      gateMsg.textContent = /offline/i.test(err.message || "") || !navigator.onLine ? "You're offline. Connect to sign in." : "Couldn't reach the server. Try again.";
+    }
+  });
+  $("signOutBtn").addEventListener("click", () => {
+    if (active()) { toast("Finish the current exercise first"); return; }
+    sheet.hidden = true;
+    window.GTSync.signOut();
+    showGate();
+  });
+  if (window.GTSync) window.GTSync.onChange(st => { if (st.status === "revoked") showGate("This code is no longer active."); });
+
   /* ---------- Boot ---------- */
   if (s.ex && !findEx(s.ex.id)) s = fresh();
-  if (active()) openTimer(s.ex.id); else { s = fresh(); save(); renderHome(); }
+  if (!window.GTStore || !window.GTStore.code()) showGate();
+  else if (active()) openTimer(s.ex.id); else { s = fresh(); save(); renderHome(); }
   requestAnimationFrame(frame);
 })();

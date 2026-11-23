@@ -21,8 +21,22 @@
 <div class="glow" aria-hidden="true"><i></i><i></i><i></i></div>
 <div class="grain" aria-hidden="true"></div>
 
+<!-- Access code -->
+<section class="view" id="gate" hidden>
+  <form class="gate" id="gateForm" autocomplete="off" novalidate>
+    <div class="gate-mark">GOOD TIMER</div>
+    <label class="gate-label" for="gateInput">ACCESS CODE</label>
+    <div class="gate-row">
+      <input id="gateInput" name="code" type="text" inputmode="text" autocapitalize="characters" autocorrect="off"
+             spellcheck="false" maxlength="9" placeholder="XXXX-XXXX" enterkeyhint="go" aria-describedby="gateMsg">
+      <button class="gate-go" id="gateGo" type="submit" aria-label="Enter"><svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
+    </div>
+    <div class="gate-msg" id="gateMsg" role="status"></div>
+  </form>
+</section>
+
 <!-- Home: body parts -->
-<section class="view" id="home">
+<section class="view" id="home" hidden>
   <div class="bar">
     <span class="eyebrow">GOOD TIMER</span>
     <button class="pill" data-history type="button">History</button>
@@ -96,6 +110,7 @@
     <div class="list" id="hist"></div>
     <div class="note" id="syncNote" hidden></div>
     <div class="sheet-actions">
+      <button class="pill quiet" id="signOutBtn" type="button">Sign out</button>
       <button class="pill" id="clearBtn" type="button">Clear all</button>
     </div>
   </div>
