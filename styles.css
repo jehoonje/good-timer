@@ -382,8 +382,8 @@ body[data-phase="rest"] #time .cs { color: var(--dim); }
 .stage {
   --ann: var(--red);
   position: absolute; left: 0; right: 0;
-  bottom: calc(50% + clamp(36px, 10vw, 84px));
-  height: clamp(64px, 18vw, 112px);
+  bottom: calc(50% + clamp(72px, 22vw, 160px));
+  height: clamp(80px, 24vw, 150px);
   display: grid; place-items: center;
   pointer-events: none;
 }
@@ -412,7 +412,7 @@ body[data-phase="rest"] #time .cs { color: var(--dim); }
 #stageText {
   position: relative;
   font-family: var(--fight); font-weight: 400;
-  font-size: clamp(40px, 13vw, 84px); line-height: 1; letter-spacing: .03em; white-space: nowrap;
+  font-size: clamp(58px, 19vw, 124px); line-height: 1; letter-spacing: .03em; white-space: nowrap;
   background: linear-gradient(180deg, #ffffff 0%, #eef1f0 48%, color-mix(in oklab, var(--ann) 60%, #ffffff) 54%, color-mix(in oklab, var(--ann) 85%, #2a1a18) 100%);
   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .45)) drop-shadow(0 0 18px color-mix(in oklab, var(--ann) 50%, transparent));
