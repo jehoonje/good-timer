@@ -396,12 +396,12 @@
       stageText.animate([{ opacity: 0 }, { opacity: 1, offset: .2 }, { opacity: 1, offset: .8 }, { opacity: 0 }], { duration: 1200, fill: "both" }).finished.then(end, () => {});
       return;
     }
-    // Symmetric: same distance, duration and mirrored easing in and out; still in the middle.
-    const D = 3000, T = .2;
+    // Same distance, duration and fast-start curve in and out; still in the middle.
+    const D = 2400, T = .25;   // 0.6s in, 1.2s hold, 0.6s out
     stageText.animate([
       { transform: "translateX(85vw) skewX(-12deg) scaleX(1.1)", opacity: .55 },
       { transform: "translateX(0) skewX(-12deg) scaleX(1)", opacity: 1, offset: T, easing: "linear" },
-      { transform: "translateX(0) skewX(-12deg) scaleX(1)", opacity: 1, offset: 1 - T, easing: "cubic-bezier(.6,0,.75,.3)" },
+      { transform: "translateX(0) skewX(-12deg) scaleX(1)", opacity: 1, offset: 1 - T, easing: "cubic-bezier(.25,.7,.4,1)" },
       { transform: "translateX(-85vw) skewX(-12deg) scaleX(1.1)", opacity: .55 }
     ], { duration: D, easing: "cubic-bezier(.25,.7,.4,1)", fill: "both" }).finished.then(end, () => {});
     setTimeout(() => {
