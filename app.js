@@ -159,26 +159,43 @@
 
   // Run a view change with a View Transition (shared hero figure + directional slide), or a CSS fallback.
   let navBusy = false;
+  // View change without the View Transitions API: the snapshot swap at its end makes iOS Safari
+  // flash once. Instead the new view fades in on the real DOM, and the body figure flies between
+  // screens as a floating copy (transform + opacity only).
   function go(dir, update) {
     if (navBusy) return;
-    if (reduced() || !document.startViewTransition) {
-      update();
-      const el = { home: $("home"), list: $("list"), timer: $("pad") }[view];
-      if (!reduced() && el) {
-        el.classList.remove("enter", "enter-back"); void el.offsetWidth;
-        el.classList.add(dir === "back" ? "enter-back" : "enter");
-      }
-      return;
+    const heroSvg = el => el && el.offsetParent !== null ? el.querySelector("svg") : null;
+    const from = heroSvg(view === "list" ? $("listFig") : document.querySelector("[data-vt]"));
+    const r0 = from && from.getBoundingClientRect();
+    update();
+    const to = heroSvg(view === "list" ? $("listFig") : document.querySelector("[data-vt]"));
+    document.querySelectorAll("[data-vt]").forEach(el => el.removeAttribute("data-vt"));
+    if (reduced()) return;
+    const el = { home: $("home"), list: $("list"), timer: $("pad") }[view];
+    if (el) {
+      el.classList.remove("enter", "enter-back"); void el.offsetWidth;
+      el.classList.add(dir === "back" ? "enter-back" : "enter");
     }
-    navBusy = true;
-    document.documentElement.dataset.dir = dir;
-    const t = document.startViewTransition(update);
-    t.finished.catch(() => {}).finally(() => {
-      navBusy = false;
-      document.querySelectorAll("[data-vt]").forEach(el => { el.style.viewTransitionName = ""; el.removeAttribute("data-vt"); });
-    });
+    if (from && to && r0 && r0.width) {
+      const r1 = to.getBoundingClientRect();
+      if (!r1.width) return;
+      navBusy = true;
+      const clone = from.cloneNode(true);
+      clone.classList.add("hero-fly");
+      Object.assign(clone.style, { left: r0.left + "px", top: r0.top + "px", width: r0.width + "px", height: r0.height + "px" });
+      clone.style.setProperty("--pt", getComputedStyle(from).getPropertyValue("--pt"));
+      document.body.appendChild(clone);
+      to.style.visibility = "hidden";
+      const k = r1.width / r0.width;
+      clone.animate([
+        { transform: "translate(0,0) scale(1)" },
+        { transform: `translate(${r1.left - r0.left}px, ${r1.top - r0.top}px) scale(${k})` }
+      ], { duration: 560, easing: "cubic-bezier(.3,.8,.2,1)", fill: "forwards" }).finished
+        .catch(() => {}).finally(() => { to.style.visibility = ""; clone.remove(); navBusy = false; });
+      setTimeout(() => { if (clone.isConnected) { to.style.visibility = ""; clone.remove(); navBusy = false; } }, 900);
+    }
   }
-  const nameHero = el => { if (el) { el.style.viewTransitionName = "hero-fig"; el.setAttribute("data-vt", ""); } };
+  const nameHero = el => { if (el) el.setAttribute("data-vt", ""); };
 
   function renderHome() {
     $("parts").innerHTML = Object.keys(PARTS).map((k, i) => `

@@ -279,11 +279,10 @@ body[data-phase="rest"] #time { text-shadow: none; }
 ::view-transition-old(hero-fig), ::view-transition-new(hero-fig) { animation-duration: .6s; animation-timing-function: cubic-bezier(.3, .8, .2, 1); height: 100%; object-fit: contain; }
 .view.enter, .view.enter-back { animation: vt-bloom-in .45s cubic-bezier(.25, .8, .25, 1) both; }
 @keyframes rise-ps2 { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-.rise { animation-name: rise-ps2; animation-duration: .55s; animation-timing-function: cubic-bezier(.25, .8, .25, 1); will-change: transform, opacity; }
+.rise { animation-name: rise-ps2; animation-duration: .55s; animation-timing-function: cubic-bezier(.25, .8, .25, 1); }
 @keyframes appear { from { opacity: 0; transform: scale(.92) translateY(10px); } to { opacity: 1; transform: none; } }
 @keyframes launch { to { opacity: 0; transform: scale(.9); } }
-.start { animation: appear .7s cubic-bezier(.25, .8, .25, 1) both .1s; will-change: transform, opacity; }
-.start .halo { will-change: transform, opacity; }
+.start { animation: appear .7s cubic-bezier(.25, .8, .25, 1) both .1s; }
 
 /* ---------- START: no flicker on iOS ---------- */
 /* Backdrop blur inside a transformed/animated button flickers on iOS Safari; drop it and the layer hints. */
@@ -308,25 +307,9 @@ body::before, body::after { bottom: auto; height: 100vh; height: 100lvh; }
   padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
 }
 
-/* ---------- Dynamic Island extension ---------- */
-.island {
-  position: fixed; z-index: 70; left: 50%;
-  top: max(11px, calc(env(safe-area-inset-top, 0px) - 48px));
-  height: 37px; width: 212px; margin-left: -106px;
-  border-radius: 19px; background: #000;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 14px 0 12px; box-sizing: border-box;
-  font-family: var(--num); font-size: 13px; font-variant-numeric: tabular-nums; color: #f2f5ff;
-  pointer-events: none;
-  animation: island-open .5s cubic-bezier(.3, 1.3, .5, 1) both;
-}
-.island .i-l { display: flex; align-items: center; gap: 6px; }
-.island .i-l i { width: 7px; height: 7px; border-radius: 50%; background: var(--red); box-shadow: 0 0 8px var(--red); }
-.island .i-l b { font-weight: 400; letter-spacing: .06em; color: #ffb3bd; }
-.island[data-kind="rest"] .i-l i { background: var(--mist); box-shadow: none; }
-.island[data-kind="rest"] .i-l b { color: var(--mist); }
-.island .i-r { min-width: 36px; text-align: right; }
-.island.bump { animation: island-bump .45s cubic-bezier(.3, 1.4, .5, 1); }
-@keyframes island-open { from { width: 126px; margin-left: -63px; color: transparent; } }
-@keyframes island-bump { 40% { transform: scale(1.06, 1.12); } }
-@media (prefers-reduced-motion: reduce) { .island, .island.bump, .start::after { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .start::after { animation: none !important; } }
+
+/* Floating copy of the body figure while it flies between screens */
+.hero-fly { position: fixed; z-index: 30; margin: 0; pointer-events: none; transform-origin: 0 0; overflow: visible; }
+/* New view simply fades up on the real DOM */
+.view.enter, .view.enter-back { animation: vt-bloom-in .45s cubic-bezier(.25, .8, .25, 1) both; }
