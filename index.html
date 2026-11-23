@@ -66,7 +66,10 @@
       <span class="rim" aria-hidden="true"></span>
       <span class="face"><span class="lbl">START</span><small>SET 1</small></span>
     </button>
-    <div id="time"><span id="mm">0:00</span><span class="cs" id="cs">.00</span></div>
+    <div class="clock" id="clock">
+      <div class="callout" id="callout"><span id="calloutText"></span></div>
+      <div id="time"><span id="mm">0:00</span><span class="cs" id="cs">.00</span></div>
+    </div>
     <div class="status" id="status" aria-live="polite"></div>
   </div>
   <div class="foot" id="foot">
@@ -100,13 +103,6 @@
     </div>
     <button class="keep" id="keepBtn" type="button">Keep going</button>
   </div>
-</div>
-
-<div class="announce" id="announce" hidden aria-hidden="true">
-  <div class="ann-band"></div>
-  <div class="ann-flash"></div>
-  <div class="ann-word" id="annMain"></div>
-  <div class="ann-word sub" id="annSub"></div>
 </div>
 
 <div class="toast" id="toast" hidden></div>
