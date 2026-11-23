@@ -211,3 +211,56 @@ body:is([data-phase="work"], [data-phase="idle"]) .status .line.now::before { ba
   transform: translate(-50%, -50%); pointer-events: none;
   background: radial-gradient(closest-side, rgba(0, 2, 8, .72), transparent);
 }
+
+/* =========================================================================
+   Minimal pass — no moving scene: a still blue void, flat panels, no fringe,
+   no corner brackets, no scanlines. Sets warm the void red, breaks go grey.
+   ========================================================================= */
+:root { --fringe: 0 0 0 transparent; --lift: none; --sheen: inset 0 0 0 1px rgba(140, 170, 255, .10); }
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none;
+  background: radial-gradient(120% 70% at 50% 115%, #0b1d44 0%, #030814 55%, #000 100%);
+  transition: filter 1.2s ease;
+}
+body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; opacity: 0;
+  background: radial-gradient(70% 45% at 50% 100%, rgba(255, 77, 99, .16), transparent 70%);
+  transition: opacity 1.2s ease;
+}
+body:is([data-phase="work"], [data-phase="idle"])::after { opacity: 1; }
+body[data-phase="rest"]::before { filter: saturate(0) brightness(.8); }
+.grain { opacity: .05; }
+
+h1 { font-weight: 500; text-shadow: none; letter-spacing: .04em; }
+.eyebrow { text-shadow: none; color: var(--dim); }
+
+.card::after, .modal-card::after { display: none; }
+.card, .resume, .modal-card, .sheet-card, .summary div, .row {
+  background: rgba(255, 255, 255, .035);
+  box-shadow: var(--sheen);
+  border-radius: 6px;
+}
+@media (hover: hover) { .card:hover { background: rgba(255, 255, 255, .06); } }
+.card:active { filter: none; }
+.part::before { display: none; }
+.part .fig { background: none; }
+.part .name { font-weight: 600; text-shadow: none; }
+.figure .hl { fill-opacity: .8; filter: drop-shadow(0 0 4px color-mix(in oklab, var(--pt) 60%, transparent)); }
+
+.pill, .back { background: rgba(255, 255, 255, .04); box-shadow: inset 0 0 0 1px rgba(140, 170, 255, .16); }
+.pill[data-armed] { box-shadow: inset 0 0 0 1px rgba(255, 77, 99, .6); }
+.pill.primary { background: rgba(110, 160, 255, .16); box-shadow: inset 0 0 0 1px rgba(110, 160, 255, .45); }
+
+body:is([data-phase="work"], [data-phase="idle"]) #time { text-shadow: 0 0 28px rgba(255, 77, 99, .35); }
+body[data-phase="rest"] #time { text-shadow: none; }
+.center::before { display: none; }
+#stageText { filter: drop-shadow(0 0 14px color-mix(in oklab, var(--ann) 45%, transparent)); }
+#log span, #log .w { box-shadow: inset 0 0 0 1px rgba(140, 170, 255, .12); background: rgba(255, 255, 255, .03); }
+#log .w { box-shadow: inset 0 0 0 1px rgba(255, 77, 99, .35); }
+
+.start .halo::after { display: none; }
+.start .face::before { box-shadow: inset 0 0 0 1px rgba(110, 160, 255, .5), inset 0 0 18px rgba(110, 160, 255, .18); }
+.start .lbl { text-shadow: none; }
+.start::after { text-shadow: none; color: var(--dim); letter-spacing: .3em; }
+.sheet-head h2, .modal-card h2 { text-shadow: none; }
+.toast { box-shadow: inset 0 0 0 1px rgba(140, 170, 255, .2); }
