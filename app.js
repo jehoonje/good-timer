@@ -173,7 +173,7 @@
     navBusy = true;
     document.documentElement.dataset.dir = dir;
     const t = document.startViewTransition(update);
-    t.finished.finally(() => {
+    t.finished.catch(() => {}).finally(() => {
       navBusy = false;
       document.querySelectorAll("[data-vt]").forEach(el => { el.style.viewTransitionName = ""; el.removeAttribute("data-vt"); });
     });
