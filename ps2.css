@@ -424,3 +424,24 @@ body::before, body::after {
 #log u { text-decoration: none; margin-left: 6px; color: var(--ink); opacity: .8; }
 /* Keep the clock still: the bottom area is the same height with the keypad, the chip, or a break */
 #pad .foot { min-height: 252px; justify-content: flex-end; }
+
+/* ---------- Rep counter · minimal single row ---------- */
+.reps {
+  flex-direction: row; align-items: center; justify-content: center; gap: 10px;
+  width: auto; max-width: none; padding: 8px 10px;
+  background: none; box-shadow: none;
+}
+.reps-total { flex: none; min-width: 64px; justify-content: flex-end; align-items: baseline; gap: 6px; padding: 0 6px 0 0; }
+.reps-num { font-size: 26px; }
+.reps-total small { font-size: 9px; letter-spacing: .22em; }
+.rk { width: 40px; height: 40px; border-radius: 50%; font-size: 16px; background: none; box-shadow: inset 0 0 0 1px rgba(200, 215, 255, .22); }
+.rk:active { background: rgba(255, 77, 99, .14); box-shadow: inset 0 0 0 1px rgba(255, 77, 99, .55); }
+.rk.ctl { width: 32px; height: 32px; box-shadow: none; color: var(--faint); }
+.rk.ctl:not(:disabled) { color: var(--dim); }
+.rk.ctl svg { width: 17px; height: 17px; }
+.rk.ok { width: 40px; height: 40px; background: none; box-shadow: inset 0 0 0 1px rgba(255, 77, 99, .55); color: #ff8796; }
+.reps.has .rk.ok { background: rgba(255, 77, 99, .14); color: #ffe9ec; }
+.rk.ok svg { width: 18px; height: 18px; }
+.reps-done { padding: 8px 14px; font-size: 12px; background: none; box-shadow: inset 0 0 0 1px rgba(255, 77, 99, .35); }
+.reps-done b { font-size: 16px; }
+#pad .foot { min-height: 150px; }

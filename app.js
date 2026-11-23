@@ -339,8 +339,8 @@
   }
 
   /* ---------- Rep counter (sets only) ----------
-     1–10 add up (10 then 2 = 12). Undo removes the last tap, clear empties it, ✓ stores the
-     count on the current set. A saved count collapses to a chip that reopens for editing. */
+     1 and 2 add up. Undo removes the last tap (hold it to clear), ✓ stores the count on the
+     current set. A saved count collapses to a chip that reopens for editing. */
   let repsEditing = false;
   const repsEl = $("reps"), repsDone = $("repsDone");
   const repTotal = () => (s.repParts || []).reduce((a, b) => a + b, 0);
@@ -354,9 +354,8 @@
     if (committed) { $("repsDoneNum").textContent = s.reps; return; }
     const total = repTotal();
     $("repsNum").textContent = total;
-    $("repsParts").textContent = s.repParts.length > 1 ? s.repParts.join(" + ") : "";
     $("repsOk").disabled = total === 0;
-    $("repsUndo").disabled = $("repsClear").disabled = s.repParts.length === 0;
+    $("repsUndo").disabled = s.repParts.length === 0;
     repsEl.classList.toggle("has", total > 0);
   }
   const tick = ms => { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} };
@@ -369,11 +368,16 @@
       s.repParts.push(+b.dataset.rep); tick(8);
       const n = $("repsNum"); n.classList.remove("bump"); void n.offsetWidth; n.classList.add("bump");
     } else if (b.id === "repsUndo") { s.repParts.pop(); tick(8); }
-    else if (b.id === "repsClear") { s.repParts = []; tick(12); }
     else if (b.id === "repsOk") { s.reps = repTotal(); repsEditing = false; tick([14, 40, 14]); }
     save(); renderReps();
   });
   repsDone.addEventListener("click", e => { e.stopPropagation(); repsEditing = true; renderReps(); });
+  // Hold undo to clear everything
+  let holdT = 0, held = false;
+  const undo = $("repsUndo");
+  undo.addEventListener("pointerdown", () => { held = false; holdT = setTimeout(() => { held = true; s.repParts = []; tick(20); save(); renderReps(); }, 550); });
+  ["pointerup", "pointerleave", "pointercancel"].forEach(ev => undo.addEventListener(ev, () => clearTimeout(holdT)));
+  undo.addEventListener("click", e => { if (held) { e.stopImmediatePropagation(); held = false; } }, true);
   // Taps anywhere on the rep counter never count toward the background double-tap.
   [repsEl, repsDone].forEach(el => ["pointerdown", "pointerup"].forEach(ev => el.addEventListener(ev, e => e.stopPropagation())));
 
