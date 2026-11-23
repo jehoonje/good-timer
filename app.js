@@ -177,7 +177,12 @@
       el.classList.add(dir === "back" ? "enter-back" : "enter");
     }
     if (from && to && r0 && r0.width) {
+      // Measure where the figure will finally rest, ignoring the entry animations still in progress.
+      const card = to.closest(".rise");
+      if (card) card.style.animation = "none";              // the target card arrives in place at once
+      el.classList.add("measuring");
       const r1 = to.getBoundingClientRect();
+      el.classList.remove("measuring");
       if (!r1.width) return;
       navBusy = true;
       const clone = from.cloneNode(true);
