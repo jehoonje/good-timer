@@ -412,7 +412,7 @@ body[data-phase="rest"] #time .cs { color: var(--dim); }
 #stageText {
   position: relative;
   font-family: var(--fight); font-weight: 400;
-  font-size: clamp(58px, 19vw, 124px); line-height: 1; letter-spacing: .03em; white-space: nowrap;
+  font-size: clamp(50px, 16vw, 108px); line-height: 1; letter-spacing: .03em; white-space: nowrap;
   background: linear-gradient(180deg, #ffffff 0%, #eef1f0 48%, color-mix(in oklab, var(--ann) 60%, #ffffff) 54%, color-mix(in oklab, var(--ann) 85%, #2a1a18) 100%);
   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .45)) drop-shadow(0 0 18px color-mix(in oklab, var(--ann) 50%, transparent));
