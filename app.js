@@ -397,7 +397,7 @@
       return;
     }
     // Same distance, duration and fast-start curve in and out; still in the middle.
-    const IN = 350, HOLD = 900, D = IN * 2 + HOLD, T = IN / D;   // snap in, hard stop, hold, snap out
+    const IN = 180, HOLD = 900, D = IN * 2 + HOLD, T = IN / D;   // snap in, hard stop, hold, snap out
     stageText.animate([
       { transform: "translateX(85vw) skewX(-12deg) scaleX(1.1)", opacity: .55, easing: "linear" },
       { transform: "translateX(0) skewX(-12deg) scaleX(1)", opacity: 1, offset: T, easing: "linear" },
