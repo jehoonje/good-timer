@@ -371,3 +371,7 @@ body::before, body::after {
   .start .face::before { transform: rotateY(65deg) rotateX(10deg); }
   .start .face::after { transform: rotateX(-20deg) rotateY(-30deg) rotateZ(45deg); }
 }
+
+/* START · single horizontal gyro: keep only the flat ring turning around the word */
+.start .face::before, .start .face::after { display: none; }
+.start .rim { inset: 8%; }
