@@ -329,3 +329,45 @@ body::before, body::after {
   height: calc(100vh + env(safe-area-inset-bottom, 0px));
   height: calc(100lvh + env(safe-area-inset-bottom, 0px));
 }
+
+/* =========================================================================
+   START · boot gyroscope — three glowing wire squares turning in 3D around the word.
+   Press pulls them in and brightens them; launch flings them outward as they fade.
+   ========================================================================= */
+.start { --d: 0px; width: min(56vw, 220px); aspect-ratio: 1; perspective: 700px; transition: scale .14s cubic-bezier(.3, 1.4, .5, 1); }
+.start .halo { inset: -20%; background: radial-gradient(closest-side, rgba(110, 160, 255, .2), transparent 70%); }
+.start .halo::after { display: none; }
+.start .rim, .start .face::before, .start .face::after {
+  content: ""; position: absolute; inset: 18%; border-radius: 4px; background: none;
+  transform-style: preserve-3d; backface-visibility: visible; -webkit-backface-visibility: visible;
+  box-shadow: inset 0 0 0 1px rgba(130, 170, 255, .75), 0 0 16px rgba(110, 160, 255, .35), inset 0 0 16px rgba(110, 160, 255, .2);
+  transition: box-shadow .14s ease, opacity .14s ease;
+}
+.start .rim { animation: gyroA 9s linear infinite; }
+.start .face {
+  background: none; box-shadow: none; overflow: visible; filter: none;
+  transform-style: preserve-3d; backface-visibility: visible; -webkit-backface-visibility: visible;
+}
+.start .face::before { animation: gyroB 12s linear infinite; opacity: 1; }
+.start .face::after { animation: gyroC 15s linear infinite; mix-blend-mode: normal; }
+.start .lbl { font-size: 20px; letter-spacing: .4em; padding-left: .4em; text-shadow: 0 0 14px rgba(110, 160, 255, .9); }
+.start small { display: none; }
+@keyframes gyroA { from { transform: rotateX(60deg) rotateZ(0); } to { transform: rotateX(60deg) rotateZ(360deg); } }
+@keyframes gyroB { from { transform: rotateY(65deg) rotateX(10deg) rotateZ(0); } to { transform: rotateY(65deg) rotateX(10deg) rotateZ(-360deg); } }
+@keyframes gyroC { from { transform: rotateX(-20deg) rotateY(-30deg) rotateZ(45deg); } to { transform: rotateX(-20deg) rotateY(-30deg) rotateZ(405deg); } }
+
+.start.pressed { scale: .86; transition-duration: .08s; }
+.start.pressed .face { transform: none; filter: none; }
+.start.pressed .rim, .start.pressed .face::before, .start.pressed .face::after {
+  opacity: 1;
+  box-shadow: inset 0 0 0 1.5px rgba(190, 215, 255, .95), 0 0 26px rgba(130, 175, 255, .7), inset 0 0 22px rgba(130, 175, 255, .4);
+}
+.start.pressed .lbl { text-shadow: 0 0 20px rgba(160, 200, 255, 1); }
+@keyframes launch { to { opacity: 0; transform: scale(1.55); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .start .rim, .start .face::before, .start .face::after { animation: none !important; }
+  .start .rim { transform: rotateX(60deg); }
+  .start .face::before { transform: rotateY(65deg) rotateX(10deg); }
+  .start .face::after { transform: rotateX(-20deg) rotateY(-30deg) rotateZ(45deg); }
+}
