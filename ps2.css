@@ -315,3 +315,17 @@ body::before, body::after { bottom: auto; height: 100vh; height: 100lvh; }
 .view.enter, .view.enter-back { animation: vt-bloom-in .45s cubic-bezier(.25, .8, .25, 1) both; }
 /* Read final positions without entry animations (used for one synchronous measurement) */
 .view.measuring, .view.measuring * { animation: none !important; }
+
+/* ---------- Home and list fill the whole screen too ---------- */
+/* In home-screen mode iOS can size 100% shorter than the screen; use the large viewport
+   and paint the backdrop past the bottom safe area so no strip is left uncovered. */
+html, body { min-height: 100vh; min-height: 100lvh; }
+#home, #list {
+  min-height: 100vh; min-height: 100lvh;
+  padding-bottom: max(24px, calc(env(safe-area-inset-bottom, 0px) + 20px));
+}
+body::before, body::after {
+  top: 0; bottom: auto;
+  height: calc(100vh + env(safe-area-inset-bottom, 0px));
+  height: calc(100lvh + env(safe-area-inset-bottom, 0px));
+}
