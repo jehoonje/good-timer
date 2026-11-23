@@ -388,7 +388,8 @@ body[data-phase="rest"] #time .cs { color: var(--dim); }
   pointer-events: none;
 }
 .stage[data-kind="rest"] { --ann: var(--mist); }
-.stage::after {
+.stage-band { display: none; }
+.stage::after { display: none;
   content: ""; position: absolute; inset: -40% 10%;
   background: radial-gradient(closest-side, color-mix(in oklab, var(--ann) 45%, white 25%), transparent);
   opacity: calc(var(--flash) * .75);

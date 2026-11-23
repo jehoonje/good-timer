@@ -396,27 +396,19 @@
       stageText.animate([{ opacity: 0 }, { opacity: 1, offset: .2 }, { opacity: 1, offset: .8 }, { opacity: 0 }], { duration: 1200, fill: "both" }).finished.then(end, () => {});
       return;
     }
-    const D = 1800;
+    const D = 3000;
     stageText.animate([
-      { transform: "translateX(70vw) skewX(-28deg) scaleX(1.5)", opacity: 0, filter: "blur(10px)" },
-      { transform: "translateX(-14px) skewX(-8deg) scaleX(.96)", opacity: 1, filter: "blur(0)", offset: .2, easing: "cubic-bezier(.3,1.4,.5,1)" },
-      { transform: "translateX(0) skewX(-12deg) scaleX(1)", opacity: 1, offset: .3 },
-      { transform: "translateX(-10px) skewX(-12deg) scaleX(1)", opacity: 1, offset: .72, easing: "cubic-bezier(.6,0,.9,.4)" },
-      { transform: "translateX(-75vw) skewX(-28deg) scaleX(1.6)", opacity: 0, filter: "blur(10px)" }
-    ], { duration: D, easing: "cubic-bezier(.2,.8,.2,1)", fill: "both" }).finished.then(end, () => {});
-    stageBand.animate([
-      { transform: "scaleX(0)", transformOrigin: "right", opacity: 0 },
-      { transform: "scaleX(1)", transformOrigin: "right", opacity: 1, offset: .18 },
-      { transform: "scaleX(1)", transformOrigin: "left", opacity: 1, offset: .74 },
-      { transform: "scaleX(0)", transformOrigin: "left", opacity: 0 }
-    ], { duration: D, easing: "cubic-bezier(.2,.8,.2,1)", fill: "both" });
-    stage.animate([{ "--flash": 0 }, { "--flash": 0, offset: .17 }, { "--flash": 1, offset: .21 }, { "--flash": 0, offset: .42 }, { "--flash": 0 }],
-                  { duration: D, fill: "both" });
+      { transform: "translateX(85vw) skewX(-18deg) scaleX(1.12)", opacity: .55, filter: "blur(2px)" },
+      { transform: "translateX(-12px) skewX(-9deg) scaleX(.98)", opacity: 1, filter: "blur(0)", offset: .14, easing: "cubic-bezier(.3,1.4,.5,1)" },
+      { transform: "translateX(0) skewX(-12deg) scaleX(1)", opacity: 1, offset: .2 },
+      { transform: "translateX(-8px) skewX(-12deg) scaleX(1)", opacity: 1, offset: .78, easing: "cubic-bezier(.55,0,.85,.45)" },
+      { transform: "translateX(-90vw) skewX(-18deg) scaleX(1.12)", opacity: .55, filter: "blur(2px)" }
+    ], { duration: D, easing: "cubic-bezier(.15,.75,.25,1)", fill: "both" }).finished.then(end, () => {});
     setTimeout(() => {
       if (run !== stageRun) return;
       stageText.parentElement.animate([6, -5, 4, -3, 2, 0].map(v => ({ transform: `translate(${v}px, ${-v / 2}px)` })), { duration: 240, easing: "ease-out" });
       try { navigator.vibrate && navigator.vibrate([18, 30, 18]); } catch (e) {}
-    }, D * .2);
+    }, D * .14);
   }
 
   /* ---------- Log + "number drops into the log" motion ---------- */
