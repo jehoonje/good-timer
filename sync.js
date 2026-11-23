@@ -83,8 +83,8 @@
   async function push() {
     const pending = load().filter(r => !r.synced && r.started_at);
     if (!pending.length) return;
-    const { error } = await client.from(cfg.table)
-      .upsert(pending.map(toRow), { onConflict: "id", ignoreDuplicates: true });
+    // insert new sessions and update edited ones
+    const { error } = await client.from(cfg.table).upsert(pending.map(toRow), { onConflict: "id" });
     if (error) throw error;
     const done = new Set(pending.map(r => r.id));
     store(load().map(r => done.has(r.id) ? { ...r, synced: true } : r));
@@ -94,11 +94,25 @@
     const { data, error } = await client.from(cfg.table)
       .select("*").order("started_at", { ascending: false }).limit(500);
     if (error) throw error;
-    const local = load();
-    const ids = new Set(local.map(r => r.id));
-    const merged = local.concat(data.filter(row => !ids.has(row.id)).map(fromRow));
+    // the server copy is the truth; keep only local sessions that haven't been pushed yet
+    const server = data.map(fromRow), ids = new Set(server.map(r => r.id));
+    const merged = server.concat(load().filter(r => !r.synced && !ids.has(r.id)));
     merged.sort((a, b) => (b.started_at || "").localeCompare(a.started_at || ""));
     store(merged);
+  }
+
+  const delKey = () => `gt-deletes:${code()}`;
+  const queuedDeletes = () => { try { return JSON.parse(ls.get(delKey())) || []; } catch (e) { return []; } };
+  async function pushDeletes() {
+    const ids = queuedDeletes(); if (!ids.length) return;
+    const { error } = await client.from(cfg.table).delete().in("id", ids);
+    if (error) throw error;
+    ls.del(delKey());
+  }
+  function deleteOne(id) {
+    store(load().filter(r => r.id !== id));
+    const q = queuedDeletes(); if (!q.includes(id)) q.push(id); ls.set(delKey(), JSON.stringify(q));
+    emit(); sync();
   }
 
   async function sync() {
@@ -109,6 +123,7 @@
     try {
       if (!(await init())) return;
       if (!(await ensureLinked())) return;
+      await pushDeletes();
       await push();
       await pull();
       set("ok");
@@ -154,7 +169,7 @@
   document.addEventListener("visibilitychange", () => { if (!document.hidden) sync(); });
 
   window.GTSync = {
-    sync, clearAll, redeem, signOut,
+    sync, clearAll, redeem, signOut, deleteOne,
     onChange(fn) { listeners.add(fn); fn({ ...state, pending: load().filter(r => !r.synced).length }); return () => listeners.delete(fn); }
   };
   sync();

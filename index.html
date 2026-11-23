@@ -76,6 +76,26 @@
     </div>
   </div>
   <div class="center">
+    <div class="setup" id="setup" hidden>
+      <div class="su-step" id="suSets">
+        <div class="su-label">SETS</div>
+        <div class="su-stepper">
+          <button type="button" class="rk" id="suMinus" aria-label="Fewer sets">−</button>
+          <span class="su-num" id="suNum">4</span>
+          <button type="button" class="rk" id="suPlus" aria-label="More sets">+</button>
+        </div>
+        <button type="button" class="pill primary" id="suNext">Next</button>
+      </div>
+      <div class="su-step" id="suWeights" hidden>
+        <div class="su-label">WEIGHT · KG</div>
+        <div class="su-list" id="suList"></div>
+        <div class="su-actions">
+          <button type="button" class="pill quiet" id="suBack">Back</button>
+          <button type="button" class="pill primary" id="suDone">Done</button>
+        </div>
+      </div>
+      <button type="button" class="su-summary" id="suSummary" hidden></button>
+    </div>
     <button class="start" id="startBtn" type="button" aria-label="Start set 1">
       <span class="halo" aria-hidden="true"></span>
       <span class="rim" aria-hidden="true"></span>
@@ -108,8 +128,20 @@
       <button class="pill" id="closeSheet" type="button">Close</button>
     </div>
     <div class="list" id="hist"></div>
+    <div class="detail" id="histDetail" hidden>
+      <div class="dt-head">
+        <button class="back icon" id="dtBack" type="button" aria-label="Back to history"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 5 8l5 5"/></svg></button>
+        <div class="dt-meta"><div class="dt-title" id="dtTitle"></div><div class="dt-sub" id="dtSub"></div></div>
+      </div>
+      <div class="dt-cols"><span>SET</span><span>KG</span><span>REPS</span><span>TIME</span></div>
+      <div class="dt-sets" id="dtSets"></div>
+      <div class="sheet-actions">
+        <button class="pill quiet" id="dtDelete" type="button">Delete</button>
+        <button class="pill primary" id="dtSave" type="button">Save</button>
+      </div>
+    </div>
     <div class="note" id="syncNote" hidden></div>
-    <div class="sheet-actions">
+    <div class="sheet-actions" id="mainActions">
       <button class="pill quiet" id="signOutBtn" type="button">Sign out</button>
       <button class="pill" id="clearBtn" type="button">Clear all</button>
     </div>

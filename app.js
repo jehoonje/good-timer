@@ -125,7 +125,7 @@
     "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === "x" ? r : (r & 3 | 8)).toString(16); }));
 
   const $ = id => document.getElementById(id);
-  const fresh = (ex = null) => ({ ex, phase: "idle", set: 1, t0: 0, startedAt: 0, sets: [], breaks: [], repParts: [], reps: null });
+  const fresh = (ex = null) => ({ ex, phase: "idle", set: 1, t0: 0, startedAt: 0, sets: [], breaks: [], repParts: [], reps: null, plan: null, setupStep: "sets", touched: [] });
   let s = fresh();
   try { const saved = JSON.parse(localStorage.getItem(KEY)); if (saved && saved.phase) s = saved; } catch (e) {}
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} };
@@ -322,26 +322,116 @@
       $("setLabel").textContent = "SET 1";
     } else if (s.phase === "rest") {
       html = `<div class="line done">Set ${s.set} complete</div><div class="line now" style="--i:1">Break ${s.set} in progress</div>`;
-      $("setLabel").textContent = "BREAK " + s.set;
-    } else if (s.set === 1) {
-      html = `<div class="line now">Set 1 in progress</div>`;
-      $("setLabel").textContent = "SET 1";
+      const nw = s.plan && s.set < s.plan.sets ? wFor(s.set + 1) : null;
+      $("setLabel").textContent = "BREAK " + s.set + (nw != null ? ` · NEXT ${fmtKg(nw)} KG` : "");
     } else {
-      html = `<div class="line done">Set ${s.set - 1} complete</div><div class="line done" style="--i:1">Break complete</div>
+      html = s.set === 1 ? `<div class="line now">Set 1 in progress</div>`
+        : `<div class="line done">Set ${s.set - 1} complete</div><div class="line done" style="--i:1">Break complete</div>
               <div class="line now" style="--i:2">Set ${s.set} in progress</div>`;
-      $("setLabel").textContent = "SET " + s.set;
+      const w = wFor(s.set);
+      $("setLabel").textContent = `SET ${s.set}${s.plan ? " / " + s.plan.sets : ""}${w != null ? ` · ${fmtKg(w)} KG` : ""}`;
     }
-    hintEl.textContent = hintFor();
+    const planDone = !!(s.plan && s.phase === "rest" && s.set >= s.plan.sets);
+    hintEl.textContent = planDone ? "All planned sets done · tap End" : hintFor();
+    endBtn.classList.toggle("cue", planDone);
     statusEl.innerHTML = html;
     renderLog();
     endBtn.disabled = s.phase === "idle";
     const idle = s.phase === "idle";
     $("timerBack").hidden = !idle;
-    $("startBtn").hidden = !idle;
     [$("clock"), statusEl, $("foot"), endBtn, $("setLabel")].forEach(el => el.hidden = idle);
     setCallout();
     renderReps();
+    renderSetup();
   }
+
+  /* ---------- Pre-start setup: how many sets → kg for each → START ---------- */
+  const fmtKg = v => { const n = +v; return Number.isInteger(n) ? String(n) : n.toFixed(1).replace(/\.0$/, ""); };
+  const validKg = v => v !== "" && v != null && !isNaN(+v) && +v >= 0 && +v < 1000;
+  function wFor(n) {
+    if (!s.plan || !s.plan.weights) return null;
+    const v = s.plan.weights[n - 1] ?? s.plan.weights[s.plan.weights.length - 1];
+    return validKg(v) ? +v : null;
+  }
+  function lastPlanFor(id) {
+    const r = loadHistory().find(r => r.exercise_id === id);
+    if (!r) return null;
+    const n = Math.min(10, Math.max(1, r.planned_sets || r.set_count || 4));
+    return { sets: n, weights: (r.sets || []).map(x => x.weight == null ? "" : String(x.weight)).slice(0, n) };
+  }
+  function ensurePlan() {
+    if (s.plan) return;
+    const lp = s.ex && lastPlanFor(s.ex.id);
+    s.plan = lp || { sets: 4, weights: [] };
+    s.setupStep = "sets"; s.touched = [];
+  }
+  const setupEl = $("setup"), suList = $("suList");
+  let suBuiltFor = -1;
+  function renderSetup() {
+    const idle = s.phase === "idle" && view === "timer";
+    setupEl.hidden = !idle;
+    if (!idle) { $("startBtn").hidden = true; suBuiltFor = -1; return; }
+    ensurePlan();
+    const step = s.setupStep || "sets";
+    $("suSets").hidden = step !== "sets";
+    $("suWeights").hidden = step !== "weights";
+    $("suSummary").hidden = step !== "ready";
+    $("startBtn").hidden = step !== "ready";
+    if (step === "sets") {
+      $("suNum").textContent = s.plan.sets;
+      $("suMinus").disabled = s.plan.sets <= 1; $("suPlus").disabled = s.plan.sets >= 10;
+      suBuiltFor = -1;
+    } else if (step === "weights") {
+      if (suBuiltFor !== s.plan.sets) buildWeights();
+      updateDone();
+    } else {
+      const ws = s.plan.weights.slice(0, s.plan.sets).map(fmtKg);
+      $("suSummary").innerHTML = `<b>${s.plan.sets}</b><small>SETS</small><span>${ws.join(" / ")} kg</span><em>EDIT</em>`;
+    }
+  }
+  function buildWeights() {
+    const n = s.plan.sets;
+    while (s.plan.weights.length < n) s.plan.weights.push(s.plan.weights.length ? s.plan.weights[s.plan.weights.length - 1] : "");
+    s.plan.weights.length = n;
+    suList.innerHTML = Array.from({ length: n }, (_, i) => `
+      <label class="su-row"><span>SET ${i + 1}</span>
+        <input id="suw${i}" data-i="${i}" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="${i < n - 1 ? "next" : "done"}" placeholder="0" value="${String(s.plan.weights[i] ?? "").replace(/"/g, "")}">
+        <small>kg</small></label>`).join("");
+    suBuiltFor = n;
+  }
+  function updateDone() { $("suDone").disabled = !s.plan.weights.slice(0, s.plan.sets).every(validKg); }
+  const cleanNum = v => { v = v.replace(",", ".").replace(/[^0-9.]/g, ""); const p = v.split("."); return p.length > 2 ? p[0] + "." + p.slice(1).join("") : v; };
+  suList.addEventListener("input", e => {
+    const inp = e.target.closest("input"); if (!inp) return;
+    const v = cleanNum(inp.value); if (v !== inp.value) inp.value = v;
+    const i = +inp.dataset.i; s.plan.weights[i] = v; (s.touched = s.touched || [])[i] = true;
+    // sets you haven't typed into yet follow the one above
+    for (let j = i + 1; j < s.plan.sets; j++) if (!s.touched[j]) { s.plan.weights[j] = v; const o = $("suw" + j); if (o) o.value = v; }
+    save(); updateDone();
+  });
+  suList.addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    e.preventDefault(); e.stopPropagation();
+    const i = +e.target.dataset.i, nx = $("suw" + (i + 1));
+    if (nx) nx.focus(); else if (!$("suDone").disabled) $("suDone").click(); else e.target.blur();
+  });
+  const stop = el => ["pointerdown", "pointerup", "click", "keydown"].forEach(ev => el.addEventListener(ev, e => e.stopPropagation()));
+  stop(setupEl);
+  $("suMinus").addEventListener("click", () => { s.plan.sets = Math.max(1, s.plan.sets - 1); save(); renderSetup(); });
+  $("suPlus").addEventListener("click", () => { s.plan.sets = Math.min(10, s.plan.sets + 1); save(); renderSetup(); });
+  $("suNext").addEventListener("click", () => {
+    s.setupStep = "weights"; save(); renderSetup();
+    const first = s.plan.weights.findIndex(v => !validKg(v));
+    setTimeout(() => { const el = $("suw" + (first < 0 ? 0 : first)); if (el && first >= 0) el.focus(); }, 60);
+  });
+  $("suBack").addEventListener("click", () => { s.setupStep = "sets"; save(); renderSetup(); });
+  $("suDone").addEventListener("click", () => {
+    if ($("suDone").disabled) return;
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    s.plan.weights = s.plan.weights.slice(0, s.plan.sets).map(v => fmtKg(v));
+    s.setupStep = "ready"; save(); renderSetup();
+  });
+  $("suSummary").addEventListener("click", () => { s.setupStep = "weights"; save(); renderSetup(); });
 
   /* ---------- Rep counter (sets only) ----------
      1 and 2 add up. Undo removes the last tap (hold it to clear), ✓ stores the count on the
@@ -395,7 +485,7 @@
   startBtn.addEventListener("pointerup", e => e.stopPropagation());
   startBtn.addEventListener("click", e => { e.stopPropagation(); begin(); });
   async function begin() {
-    if (starting || s.phase !== "idle") return;
+    if (starting || s.phase !== "idle" || s.setupStep !== "ready") return;
     starting = true;
     const rm = reduced();
     startBtn.classList.add("pressed");
@@ -448,7 +538,7 @@
       s.sets.push({ n: 1, started_at: iso(s.t0), ended_at: iso(now), duration_ms: now - s.t0 });
       s.phase = "rest"; s.t0 = now;
     } else if (s.phase === "work") {
-      s.sets.push({ n: s.set, started_at: iso(s.t0), ended_at: iso(now), duration_ms: now - s.t0, reps: s.reps ?? null });
+      s.sets.push({ n: s.set, started_at: iso(s.t0), ended_at: iso(now), duration_ms: now - s.t0, reps: s.reps ?? null, weight: wFor(s.set) });
       s.phase = "rest"; s.t0 = now; s.repParts = []; s.reps = null; repsEditing = false;
     } else {
       s.breaks.push({ n: s.set, started_at: iso(s.t0), ended_at: iso(now), duration_ms: now - s.t0 });
@@ -496,7 +586,8 @@
   function renderLog() {
     const items = [];
     s.sets.forEach((st, i) => {
-      items.push(`<span class="w"><b>S${st.n}</b><em>${st.duration_ms == null ? "—" : fmt(st.duration_ms)}</em>${st.reps != null ? `<u>×${st.reps}</u>` : ""}</span>`);
+      const tail = st.weight != null && st.reps != null ? `${fmtKg(st.weight)}×${st.reps}` : st.reps != null ? `×${st.reps}` : st.weight != null ? `${fmtKg(st.weight)}kg` : "";
+      items.push(`<span class="w"><b>S${st.n}</b><em>${st.duration_ms == null ? "—" : fmt(st.duration_ms)}</em>${tail ? `<u>${tail}</u>` : ""}</span>`);
       const br = s.breaks[i];
       if (br) items.push(`<span class="r"><b>B${br.n}</b><em>${fmt(br.duration_ms)}</em></span>`);
     });
@@ -588,7 +679,7 @@
   const avg = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0;
   function setsUntil(now) {
     return s.phase === "work"
-      ? s.sets.concat({ n: s.set, started_at: iso(s.t0), ended_at: iso(now), duration_ms: now - s.t0, reps: s.reps ?? null })
+      ? s.sets.concat({ n: s.set, started_at: iso(s.t0), ended_at: iso(now), duration_ms: now - s.t0, reps: s.reps ?? null, weight: wFor(s.set) })
       : s.sets.slice();
   }
   function openEnd() {
@@ -618,6 +709,7 @@
         ended_at: iso(endAt),
         duration_ms: endAt - s.startedAt,
         set_count: sets.length,
+        planned_sets: s.plan ? s.plan.sets : null,
         sets,
         breaks: s.breaks,
         synced: false
@@ -645,17 +737,71 @@
     const h = loadHistory();
     if (!h.length) { histEl.innerHTML = `<div class="empty">No workouts saved yet. Finish an exercise with End and choose Save.</div>`; return; }
     histEl.innerHTML = h.map(r => `
-      <div class="row">
+      <div class="row" data-id="${r.id}" role="button" tabindex="0">
         <span class="when">${(findEx(r.exercise_id) || {}).name || r.exercise_name || "Workout"}<small>${dateLabel(r.started_at)}${r.body_part && PARTS[r.body_part] ? " · " + PARTS[r.body_part].name : ""}</small></span>
         <span class="meta">${r.set_count} sets</span>
         <span class="meta">${fmtShort(r.duration_ms)}</span>
-        <span class="rests">${(r.sets || []).some(x => x.reps != null) ? "Reps " + r.sets.map(x => x.reps ?? "–").join(" · ") + "<br>" : ""}${r.breaks.length ? "Rest " + r.breaks.map(b => fmt(b.duration_ms)).join(" · ") : "No rests"}</span>
+        <span class="rests">${setsLine(r)}${r.breaks.length ? "Rest " + r.breaks.map(b => fmt(b.duration_ms)).join(" · ") : "No rests"}</span>
       </div>`).join("");
   }
+  function setsLine(r) {
+    const S = r.sets || [];
+    if (S.some(x => x.weight != null)) return "Sets " + S.map(x => (x.weight != null ? fmtKg(x.weight) : "–") + (x.reps != null ? "×" + x.reps : "")).join(" · ") + "<br>";
+    if (S.some(x => x.reps != null)) return "Reps " + S.map(x => x.reps ?? "–").join(" · ") + "<br>";
+    return "";
+  }
   function openSheet() {
+    closeDetail(true);
     renderHist();
     sheet.hidden = false;
   }
+
+  /* ---------- History detail: edit kg / reps per set, or delete ---------- */
+  let dtId = null;
+  const dtEl = $("histDetail"), dtSets = $("dtSets");
+  function openDetail(id) {
+    const r = loadHistory().find(x => x.id === id); if (!r) return;
+    dtId = id;
+    $("dtTitle").textContent = (findEx(r.exercise_id) || {}).name || r.exercise_name || "Workout";
+    $("dtSub").textContent = `${dateLabel(r.started_at)} · ${r.set_count} sets · ${fmtShort(r.duration_ms)}`;
+    dtSets.innerHTML = (r.sets || []).map((x, i) => `
+      <div class="dt-row"><span>S${x.n ?? i + 1}</span>
+        <input data-i="${i}" data-k="weight" type="text" inputmode="decimal" autocomplete="off" placeholder="–" value="${x.weight ?? ""}" aria-label="Set ${i + 1} weight in kg">
+        <input data-i="${i}" data-k="reps" type="text" inputmode="numeric" autocomplete="off" placeholder="–" value="${x.reps ?? ""}" aria-label="Set ${i + 1} reps">
+        <em>${x.duration_ms != null ? fmtShort(x.duration_ms) : "—"}</em></div>`).join("") || `<div class="empty">No sets recorded.</div>`;
+    histEl.hidden = true; $("mainActions").hidden = true; dtEl.hidden = false;
+    $("sheetTitle").textContent = "Edit";
+  }
+  function closeDetail(quiet) {
+    dtId = null; dtEl.hidden = true; histEl.hidden = false; $("mainActions").hidden = false;
+    $("sheetTitle").textContent = "History";
+    if (!quiet) renderHist();
+  }
+  histEl.addEventListener("click", e => { const row = e.target.closest(".row[data-id]"); if (row) openDetail(row.dataset.id); });
+  histEl.addEventListener("keydown", e => { if (e.key === "Enter") { const row = e.target.closest(".row[data-id]"); if (row) openDetail(row.dataset.id); } });
+  dtSets.addEventListener("input", e => {
+    const inp = e.target.closest("input"); if (!inp) return;
+    const v = inp.dataset.k === "reps" ? inp.value.replace(/[^0-9]/g, "") : cleanNum(inp.value);
+    if (v !== inp.value) inp.value = v;
+  });
+  $("dtBack").addEventListener("click", () => closeDetail());
+  $("dtSave").addEventListener("click", () => {
+    const h = loadHistory(); const r = h.find(x => x.id === dtId);
+    if (!r) return closeDetail();
+    dtSets.querySelectorAll("input").forEach(inp => {
+      const i = +inp.dataset.i, k = inp.dataset.k, v = inp.value.trim();
+      r.sets[i][k] = v === "" ? null : k === "reps" ? Math.round(+v) : +(+v).toFixed(2);
+    });
+    r.synced = false; r.edited_at = new Date().toISOString();
+    saveHistory(h);
+    if (window.GTSync) window.GTSync.sync();
+    toast("Saved"); closeDetail();
+  });
+  confirmable($("dtDelete"), "Delete", "Tap again to delete", () => {
+    if (window.GTSync && window.GTSync.deleteOne) window.GTSync.deleteOne(dtId);
+    else saveHistory(loadHistory().filter(x => x.id !== dtId));
+    toast("Deleted"); closeDetail();
+  });
   $("closeSheet").addEventListener("click", () => sheet.hidden = true);
   sheet.addEventListener("click", e => { if (e.target === sheet) sheet.hidden = true; });
   confirmable($("clearBtn"), "Clear all", "Tap again to clear", async () => {
