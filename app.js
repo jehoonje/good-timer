@@ -125,7 +125,7 @@
     "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === "x" ? r : (r & 3 | 8)).toString(16); }));
 
   const $ = id => document.getElementById(id);
-  const fresh = (ex = null) => ({ ex, phase: "idle", set: 1, t0: 0, startedAt: 0, sets: [], breaks: [] });
+  const fresh = (ex = null) => ({ ex, phase: "idle", set: 1, t0: 0, startedAt: 0, sets: [], breaks: [], repParts: [], reps: null });
   let s = fresh();
   try { const saved = JSON.parse(localStorage.getItem(KEY)); if (saved && saved.phase) s = saved; } catch (e) {}
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} };
@@ -335,7 +335,47 @@
     $("startBtn").hidden = !idle;
     [$("clock"), statusEl, $("foot"), endBtn, $("setLabel")].forEach(el => el.hidden = idle);
     setCallout();
+    renderReps();
   }
+
+  /* ---------- Rep counter (sets only) ----------
+     1–10 add up (10 then 2 = 12). Undo removes the last tap, clear empties it, ✓ stores the
+     count on the current set. A saved count collapses to a chip that reopens for editing. */
+  let repsEditing = false;
+  const repsEl = $("reps"), repsDone = $("repsDone");
+  const repTotal = () => (s.repParts || []).reduce((a, b) => a + b, 0);
+  function renderReps() {
+    if (!s.repParts) s.repParts = [];
+    const on = s.phase === "work";
+    const committed = s.reps != null && !repsEditing;
+    repsEl.hidden = !on || committed;
+    repsDone.hidden = !on || !committed;
+    if (!on) return;
+    if (committed) { $("repsDoneNum").textContent = s.reps; return; }
+    const total = repTotal();
+    $("repsNum").textContent = total;
+    $("repsParts").textContent = s.repParts.length > 1 ? s.repParts.join(" + ") : "";
+    $("repsOk").disabled = total === 0;
+    $("repsUndo").disabled = $("repsClear").disabled = s.repParts.length === 0;
+    repsEl.classList.toggle("has", total > 0);
+  }
+  const tick = ms => { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} };
+  repsEl.addEventListener("click", e => {
+    const b = e.target.closest("button");
+    if (!b || b.disabled) return;
+    e.stopPropagation();
+    if (b.dataset.rep) {
+      if (repTotal() + +b.dataset.rep > 999) return;
+      s.repParts.push(+b.dataset.rep); tick(8);
+      const n = $("repsNum"); n.classList.remove("bump"); void n.offsetWidth; n.classList.add("bump");
+    } else if (b.id === "repsUndo") { s.repParts.pop(); tick(8); }
+    else if (b.id === "repsClear") { s.repParts = []; tick(12); }
+    else if (b.id === "repsOk") { s.reps = repTotal(); repsEditing = false; tick([14, 40, 14]); }
+    save(); renderReps();
+  });
+  repsDone.addEventListener("click", e => { e.stopPropagation(); repsEditing = true; renderReps(); });
+  // Taps anywhere on the rep counter never count toward the background double-tap.
+  [repsEl, repsDone].forEach(el => ["pointerdown", "pointerup"].forEach(ev => el.addEventListener(ev, e => e.stopPropagation())));
 
   /* ---------- 3D start button ---------- */
   const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -358,7 +398,7 @@
       await wait(460);
     }
     const now = Date.now();
-    s.phase = "work"; s.set = 1; s.t0 = now; s.startedAt = now;
+    s.phase = "work"; s.set = 1; s.t0 = now; s.startedAt = now; s.repParts = []; s.reps = null; repsEditing = false;
     save(); keepAwake();
     startBtn.classList.remove("launch", "pressed");
     renderStatus();
@@ -399,8 +439,8 @@
       s.sets.push({ n: 1, started_at: iso(s.t0), ended_at: iso(now), duration_ms: now - s.t0 });
       s.phase = "rest"; s.t0 = now;
     } else if (s.phase === "work") {
-      s.sets.push({ n: s.set, started_at: iso(s.t0), ended_at: iso(now), duration_ms: now - s.t0 });
-      s.phase = "rest"; s.t0 = now;
+      s.sets.push({ n: s.set, started_at: iso(s.t0), ended_at: iso(now), duration_ms: now - s.t0, reps: s.reps ?? null });
+      s.phase = "rest"; s.t0 = now; s.repParts = []; s.reps = null; repsEditing = false;
     } else {
       s.breaks.push({ n: s.set, started_at: iso(s.t0), ended_at: iso(now), duration_ms: now - s.t0 });
       s.set += 1; s.phase = "work"; s.t0 = now;
@@ -447,7 +487,7 @@
   function renderLog() {
     const items = [];
     s.sets.forEach((st, i) => {
-      items.push(`<span class="w"><b>S${st.n}</b><em>${st.duration_ms == null ? "—" : fmt(st.duration_ms)}</em></span>`);
+      items.push(`<span class="w"><b>S${st.n}</b><em>${st.duration_ms == null ? "—" : fmt(st.duration_ms)}</em>${st.reps != null ? `<u>×${st.reps}</u>` : ""}</span>`);
       const br = s.breaks[i];
       if (br) items.push(`<span class="r"><b>B${br.n}</b><em>${fmt(br.duration_ms)}</em></span>`);
     });
@@ -494,7 +534,7 @@
   const GAP = 380;
   let lastTap = 0, armT = null;
   pad.addEventListener("pointerup", e => {
-    if (e.target.closest("button") || s.phase === "idle") return;
+    if (e.target.closest("button, .reps, .reps-done") || s.phase === "idle") return;
     pad.style.setProperty("--tx", e.clientX + "px");   // tap glow spreads from the finger
     pad.style.setProperty("--ty", e.clientY + "px");
     const now = performance.now();
@@ -529,7 +569,7 @@
   const avg = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0;
   function setsUntil(now) {
     return s.phase === "work"
-      ? s.sets.concat({ n: s.set, started_at: iso(s.t0), ended_at: iso(now), duration_ms: now - s.t0 })
+      ? s.sets.concat({ n: s.set, started_at: iso(s.t0), ended_at: iso(now), duration_ms: now - s.t0, reps: s.reps ?? null })
       : s.sets.slice();
   }
   function openEnd() {
@@ -590,7 +630,7 @@
         <span class="when">${(findEx(r.exercise_id) || {}).name || r.exercise_name || "Workout"}<small>${dateLabel(r.started_at)}${r.body_part && PARTS[r.body_part] ? " · " + PARTS[r.body_part].name : ""}</small></span>
         <span class="meta">${r.set_count} sets</span>
         <span class="meta">${fmtShort(r.duration_ms)}</span>
-        <span class="rests">${r.breaks.length ? "Rest " + r.breaks.map(b => fmt(b.duration_ms)).join(" · ") : "No rests"}</span>
+        <span class="rests">${(r.sets || []).some(x => x.reps != null) ? "Reps " + r.sets.map(x => x.reps ?? "–").join(" · ") + "<br>" : ""}${r.breaks.length ? "Rest " + r.breaks.map(b => fmt(b.duration_ms)).join(" · ") : "No rests"}</span>
       </div>`).join("");
   }
   function openSheet() {
