@@ -378,35 +378,45 @@
     announce();
   }
 
-  /* ---------- Fighting-game style callout above the clock ---------- */
-  // "SET n" / "BREAK n" sits above the time; on every switch it slams in with a flash, streak and shake.
-  const callout = $("callout"), calloutText = $("calloutText");
-  function setCallout() {
-    if (s.phase === "idle") return;
-    callout.dataset.kind = s.phase === "rest" ? "rest" : "work";
-    calloutText.textContent = (s.phase === "rest" ? "BREAK " : "SET ") + s.set;
-  }
+  /* ---------- Fighting-game style fly-by above the clock ---------- */
+  // "SET n" / "BREAK n" flies in from the right into its own lane above the clock,
+  // lands with a flash and shake, holds, then flies off to the left.
+  const stage = $("stage"), stageText = $("stageText"), stageBand = stage.querySelector(".stage-band");
+  let stageRun = 0;
+  function setCallout() {}
   function announce() {
-    setCallout();
-    if (reduced()) return;
-    callout.getAnimations({ subtree: true }).forEach(a => a.cancel());
-    const E = "cubic-bezier(.2,.9,.2,1)";
-    calloutText.animate([
-      { transform: "skewX(-12deg) translateX(-40px) scale(2.4)", opacity: 0, filter: "blur(12px)" },
-      { transform: "skewX(-12deg) translateX(0) scale(.92)", opacity: 1, filter: "blur(0)", offset: .45 },
-      { transform: "skewX(-12deg) scale(1.05)", offset: .65 },
-      { transform: "skewX(-12deg) scale(1)", opacity: 1 }
-    ], { duration: 520, easing: E });
-    callout.animate([
-      { "--sweep": "0", "--flash": "0" },
-      { "--sweep": "0", "--flash": "1", offset: .3 },
-      { "--sweep": "1", "--flash": "0" }
-    ], { duration: 700, easing: "ease-out" });
+    if (s.phase === "idle") return;
+    const run = ++stageRun;
+    stage.getAnimations({ subtree: true }).forEach(a => a.cancel());
+    stage.dataset.kind = s.phase === "rest" ? "rest" : "work";
+    stageText.textContent = (s.phase === "rest" ? "BREAK " : "SET ") + s.set;
+    stage.hidden = false;
+    const end = () => { if (run === stageRun) stage.hidden = true; };
+    if (reduced()) {
+      stageText.animate([{ opacity: 0 }, { opacity: 1, offset: .2 }, { opacity: 1, offset: .8 }, { opacity: 0 }], { duration: 1200, fill: "both" }).finished.then(end, () => {});
+      return;
+    }
+    const D = 1800;
+    stageText.animate([
+      { transform: "translateX(70vw) skewX(-28deg) scaleX(1.5)", opacity: 0, filter: "blur(10px)" },
+      { transform: "translateX(-14px) skewX(-8deg) scaleX(.96)", opacity: 1, filter: "blur(0)", offset: .2, easing: "cubic-bezier(.3,1.4,.5,1)" },
+      { transform: "translateX(0) skewX(-12deg) scaleX(1)", opacity: 1, offset: .3 },
+      { transform: "translateX(-10px) skewX(-12deg) scaleX(1)", opacity: 1, offset: .72, easing: "cubic-bezier(.6,0,.9,.4)" },
+      { transform: "translateX(-75vw) skewX(-28deg) scaleX(1.6)", opacity: 0, filter: "blur(10px)" }
+    ], { duration: D, easing: "cubic-bezier(.2,.8,.2,1)", fill: "both" }).finished.then(end, () => {});
+    stageBand.animate([
+      { transform: "scaleX(0)", transformOrigin: "right", opacity: 0 },
+      { transform: "scaleX(1)", transformOrigin: "right", opacity: 1, offset: .18 },
+      { transform: "scaleX(1)", transformOrigin: "left", opacity: 1, offset: .74 },
+      { transform: "scaleX(0)", transformOrigin: "left", opacity: 0 }
+    ], { duration: D, easing: "cubic-bezier(.2,.8,.2,1)", fill: "both" });
+    stage.animate([{ "--flash": 0 }, { "--flash": 0, offset: .17 }, { "--flash": 1, offset: .21 }, { "--flash": 0, offset: .42 }, { "--flash": 0 }],
+                  { duration: D, fill: "both" });
     setTimeout(() => {
-      const k = [6, -5, 4, -3, 2, 0];
-      callout.animate(k.map((v, i) => ({ transform: `translate(${v}px, ${-v / 2}px)` })), { duration: 240, easing: "ease-out" });
+      if (run !== stageRun) return;
+      stageText.parentElement.animate([6, -5, 4, -3, 2, 0].map(v => ({ transform: `translate(${v}px, ${-v / 2}px)` })), { duration: 240, easing: "ease-out" });
       try { navigator.vibrate && navigator.vibrate([18, 30, 18]); } catch (e) {}
-    }, 230);
+    }, D * .2);
   }
 
   /* ---------- Log + "number drops into the log" motion ---------- */
