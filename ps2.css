@@ -460,3 +460,15 @@ body::before, body::after {
 #log > :last-child { margin-right: auto; }
 /* Saved-reps pill sits exactly where the 1/2 row was */
 .reps-done { height: 40px; margin-block: 8px; padding: 0 14px; box-sizing: border-box; }
+
+/* Clock centered on the whole screen, not on the space between the top bar and the bottom area */
+#pad { position: relative; }
+#pad .center { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+#pad .center > * { pointer-events: auto; }
+#pad .bar, #pad .foot { position: relative; z-index: 2; }
+#pad .foot { margin-top: auto; }
+
+/* Log: whole chips only, no faded edge; older ones fold into a +N tag */
+#log { overflow: hidden; -webkit-mask-image: none; mask-image: none; justify-content: center; padding: 2px 0; }
+#log > :first-child, #log > :last-child { margin: 0; }
+#log .more { color: var(--dim); background: none; box-shadow: inset 0 0 0 1px rgba(140, 170, 255, .1); }

@@ -500,7 +500,15 @@
     });
     const log = $("log");
     log.innerHTML = items.join("");
-    log.scrollLeft = log.scrollWidth;   // newest chip in view
+    // Show only whole chips: drop the oldest until the row fits, and count them in a "+N" tag.
+    if (log.clientWidth) {
+      let dropped = 0;
+      while (log.scrollWidth > log.clientWidth && log.children.length > 1) {
+        if (log.firstElementChild.classList.contains("more")) log.firstElementChild.remove();
+        log.firstElementChild.remove(); dropped++;
+        log.insertAdjacentHTML("afterbegin", `<span class="more">+${dropped}</span>`);
+      }
+    }
   }
   // Freeze a copy of the big number where it sits, before the state changes.
   function lift() {
