@@ -191,13 +191,24 @@
       clone.style.setProperty("--pt", getComputedStyle(from).getPropertyValue("--pt"));
       document.body.appendChild(clone);
       to.style.visibility = "hidden";
-      const k = r1.width / r0.width;
+      // The figure is drawn aspect-fit (100:170) inside each box, and the two boxes differ in shape,
+      // so match the drawn figure's height and center rather than the boxes.
+      const drawnH = r => Math.min(r.height, r.width * 1.7);
+      const k = drawnH(r1) / drawnH(r0);
+      const dx = (r1.left + r1.width / 2) - (r0.left + r0.width / 2);
+      const dy = (r1.top + r1.height / 2) - (r0.top + r0.height / 2);
+      clone.style.transformOrigin = "50% 50%";
       clone.animate([
         { transform: "translate(0,0) scale(1)" },
-        { transform: `translate(${r1.left - r0.left}px, ${r1.top - r0.top}px) scale(${k})` }
+        { transform: `translate(${dx}px, ${dy}px) scale(${k})` }
       ], { duration: 560, easing: "cubic-bezier(.3,.8,.2,1)", fill: "forwards" }).finished
-        .catch(() => {}).finally(() => { to.style.visibility = ""; clone.remove(); navBusy = false; });
-      setTimeout(() => { if (clone.isConnected) { to.style.visibility = ""; clone.remove(); navBusy = false; } }, 900);
+        .catch(() => {}).finally(() => {
+          to.style.visibility = "";
+          // brief cross-fade so the hand-off to the real figure is seamless
+          clone.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, fill: "forwards" }).finished
+            .catch(() => {}).finally(() => { clone.remove(); navBusy = false; });
+        });
+      setTimeout(() => { if (clone.isConnected) { to.style.visibility = ""; clone.remove(); navBusy = false; } }, 1100);
     }
   }
   const nameHero = el => { if (el) el.setAttribute("data-vt", ""); };
