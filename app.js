@@ -239,8 +239,11 @@
   function lastFor(id) {
     const r = loadHistory().find(r => r.exercise_id === id);
     if (!r) return "";
-    const d = new Date(r.started_at);
-    return `Last ${d.getMonth() + 1}/${d.getDate()} · ${r.set_count} sets`;
+    // whole calendar days between that session and today
+    const day = t => { const x = new Date(t); x.setHours(0, 0, 0, 0); return x.getTime(); };
+    const n = Math.round((day(Date.now()) - day(r.started_at)) / 86400000);
+    const when = n <= 0 ? "Today" : n === 1 ? "Yesterday" : `${n} days ago`;
+    return `${when} · ${r.set_count} sets`;
   }
 
   function renderList(part) {
@@ -254,7 +257,7 @@
     $("exs").innerHTML = EX[part].map(([id, name, eq, target], i) => `
       <button class="card ex rise${active() && s.ex.id === id ? " active" : ""}" type="button" data-ex="${id}" style="--pt:var(${P.tone});--i:${i}">
         <span class="glyph"><svg viewBox="0 0 24 24">${EQUIP[eq][1]}</svg></span>
-        <span><div class="name">${name}</div><div class="tags">${EQUIP[eq][0]} · ${target}</div></span>
+        <span><div class="name">${name}</div></span>
         <span class="last">${active() && s.ex.id === id ? "In progress" : lastFor(id)}</span>
       </button>`).join("");
     show("list");
@@ -495,7 +498,9 @@
       const br = s.breaks[i];
       if (br) items.push(`<span class="r"><b>B${br.n}</b><em>${fmt(br.duration_ms)}</em></span>`);
     });
-    $("log").innerHTML = items.join("");
+    const log = $("log");
+    log.innerHTML = items.join("");
+    log.scrollLeft = log.scrollWidth;   // newest chip in view
   }
   // Freeze a copy of the big number where it sits, before the state changes.
   function lift() {
