@@ -396,19 +396,18 @@
       stageText.animate([{ opacity: 0 }, { opacity: 1, offset: .2 }, { opacity: 1, offset: .8 }, { opacity: 0 }], { duration: 1200, fill: "both" }).finished.then(end, () => {});
       return;
     }
-    const D = 3000;
+    // Symmetric: same distance, duration and mirrored easing in and out; still in the middle.
+    const D = 3000, T = .2;
     stageText.animate([
-      { transform: "translateX(85vw) skewX(-18deg) scaleX(1.12)", opacity: .55, filter: "blur(2px)" },
-      { transform: "translateX(-12px) skewX(-9deg) scaleX(.98)", opacity: 1, filter: "blur(0)", offset: .14, easing: "cubic-bezier(.3,1.4,.5,1)" },
-      { transform: "translateX(0) skewX(-12deg) scaleX(1)", opacity: 1, offset: .2 },
-      { transform: "translateX(-8px) skewX(-12deg) scaleX(1)", opacity: 1, offset: .78, easing: "cubic-bezier(.55,0,.85,.45)" },
-      { transform: "translateX(-90vw) skewX(-18deg) scaleX(1.12)", opacity: .55, filter: "blur(2px)" }
-    ], { duration: D, easing: "cubic-bezier(.15,.75,.25,1)", fill: "both" }).finished.then(end, () => {});
+      { transform: "translateX(85vw) skewX(-12deg) scaleX(1.1)", opacity: .55 },
+      { transform: "translateX(0) skewX(-12deg) scaleX(1)", opacity: 1, offset: T, easing: "linear" },
+      { transform: "translateX(0) skewX(-12deg) scaleX(1)", opacity: 1, offset: 1 - T, easing: "cubic-bezier(.6,0,.75,.3)" },
+      { transform: "translateX(-85vw) skewX(-12deg) scaleX(1.1)", opacity: .55 }
+    ], { duration: D, easing: "cubic-bezier(.25,.7,.4,1)", fill: "both" }).finished.then(end, () => {});
     setTimeout(() => {
       if (run !== stageRun) return;
-      stageText.parentElement.animate([6, -5, 4, -3, 2, 0].map(v => ({ transform: `translate(${v}px, ${-v / 2}px)` })), { duration: 240, easing: "ease-out" });
-      try { navigator.vibrate && navigator.vibrate([18, 30, 18]); } catch (e) {}
-    }, D * .14);
+      try { navigator.vibrate && navigator.vibrate(20); } catch (e) {}
+    }, D * T);
   }
 
   /* ---------- Log + "number drops into the log" motion ---------- */
