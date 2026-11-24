@@ -622,3 +622,16 @@ body[data-phase="idle"] #pad .center { flex-direction: column; gap: 30px; }
 .dt-row:focus-within { border-bottom-color: #7da2ff; }
 .dt-cols { font-size: 12px; letter-spacing: .12em; color: var(--dim); }
 .dt-meta { min-width: 0; }
+
+/* =========================================================================
+   Legibility: lift the two quiet text tones a step, same blue-grey family.
+   Home: the question is one short line and the four cards fit without scrolling.
+   ========================================================================= */
+:root { --dim: #9fb0d6; --faint: #5a6a92; }
+#home h1 {
+  font-size: clamp(17px, 5vw, 24px); line-height: 1.2; letter-spacing: .04em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin: 18px 0 16px;
+}
+#home .part .fig { height: clamp(96px, calc((100svh - 400px) / 2), 168px); }
+#home .parts { gap: 10px; }
