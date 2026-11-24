@@ -3,8 +3,8 @@
   "short_name": "Good Timer",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0b0f12",
-  "theme_color": "#0b0f12",
+  "background_color": "#06080d",
+  "theme_color": "#06080d",
   "icons": [
     { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" },
     { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
