@@ -1,10 +1,10 @@
 (() => {
   /* ---------- Data ---------- */
   const PARTS = {
-    back:     { name: "Back",      tone: "--t-back",     view: "back" },
-    chest:    { name: "Chest",     tone: "--t-chest",    view: "front" },
-    shoulder: { name: "Shoulders", tone: "--t-shoulder", view: "front" },
-    legs:     { name: "Legs",      tone: "--t-legs",     view: "front" }
+    back:     { name: "Back",      view: "back" },
+    chest:    { name: "Chest",     view: "front" },
+    shoulder: { name: "Shoulders", view: "front" },
+    legs:     { name: "Legs",      view: "front" }
   };
   // [id, name, equipment, primary target]
   const EX = {
@@ -59,13 +59,6 @@
       ["calf-raise", "Calf Raise", "machine", "Calves"]
     ]
   };
-  const EQUIP = {
-    barbell: ["Barbell", '<path d="M2 12h20"/><rect x="4" y="7" width="3" height="10" rx="1"/><rect x="17" y="7" width="3" height="10" rx="1"/>'],
-    dumbbell: ["Dumbbell", '<path d="M8 12h8"/><rect x="4" y="8" width="4" height="8" rx="1.5"/><rect x="16" y="8" width="4" height="8" rx="1.5"/>'],
-    cable: ["Cable", '<circle cx="12" cy="5" r="2.5"/><path d="M12 7.5V17"/><path d="M8 19h8"/>'],
-    machine: ["Machine", '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h6"/>'],
-    body: ["Bodyweight", '<circle cx="12" cy="5" r="2.2"/><path d="M12 8v7M8 11h8M12 15l-3 5M12 15l3 5"/>']
-  };
   const findEx = id => { for (const p in EX) for (const e of EX[p]) if (e[0] === id) return { id: e[0], name: e[1], equip: e[2], target: e[3], part: p }; return null; };
 
   /* ---------- Figure ---------- */
@@ -113,7 +106,7 @@
       const on = k === part;
       return `<path class="${on ? "m hl" : "m"}" d="${d}"/>${on && fib ? `<path class="hl-fib" d="${fib}"/>` : ""}`;
     }).join("");
-    return `<svg class="figure" viewBox="0 0 100 170" style="--pt:var(${PARTS[part].tone})" aria-hidden="true">
+    return `<svg class="figure" viewBox="0 0 100 170" aria-hidden="true">
       ${SKIN}<g>${half}</g><g transform="translate(100 0) scale(-1 1)">${half}</g></svg>`;
   }
 
@@ -142,10 +135,10 @@
   };
   const fmt = ms => split(ms).join("");
   const fmtShort = ms => split(ms)[0];
+  const setsN = n => `${n} set${n === 1 ? "" : "s"}`;
 
   /* ---------- Views & motion ---------- */
   let view = "home", curPart = null;
-  const setTone = part => document.body.style.setProperty("--tone", part ? `var(${PARTS[part].tone})` : "var(--cool)");
   const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function show(v) {
@@ -190,7 +183,6 @@
       const clone = from.cloneNode(true);
       clone.classList.add("hero-fly");
       Object.assign(clone.style, { left: r0.left + "px", top: r0.top + "px", width: r0.width + "px", height: r0.height + "px" });
-      clone.style.setProperty("--pt", getComputedStyle(from).getPropertyValue("--pt"));
       document.body.appendChild(clone);
       to.style.visibility = "hidden";
       // The figure is drawn aspect-fit (100:170) inside each box, and the two boxes differ in shape,
@@ -217,7 +209,7 @@
 
   function renderHome() {
     $("parts").innerHTML = Object.keys(PARTS).map((k, i) => `
-      <button class="card part rise" type="button" data-part="${k}" style="--pt:var(${PARTS[k].tone});--i:${i}">
+      <button class="card part rise" type="button" data-part="${k}" style="--i:${i}">
         <div class="fig">${figure(k)}</div>
         <div class="label">
           <div class="name">${PARTS[k].name}</div>
@@ -225,7 +217,6 @@
         </div>
       </button>`).join("");
     renderResume();
-    setTone(active() ? s.ex.part : null);
     show("home");
   }
 
@@ -233,9 +224,9 @@
     const slot = $("resumeSlot");
     if (!active()) { slot.innerHTML = ""; return; }
     const ex = findEx(s.ex.id);
-    const state = s.phase === "rest" ? `Set ${s.set} complete · Resting` : `Set ${s.set} in progress`;
-    slot.innerHTML = `<button class="resume rise" type="button" id="resumeBtn" style="--tone:var(${PARTS[ex.part].tone})">
-      <span><i class="dot"></i><span><b>${ex.name}</b><small>${state}</small></span></span><span class="t" id="resumeT"></span></button>`;
+    const state = s.phase === "rest" ? `Break ${s.set}` : `Set ${s.set}`;
+    slot.innerHTML = `<button class="card resume rise" type="button" id="resumeBtn">
+      <span><span>${ex.name}</span><small class="aux">${state}</small></span><span class="t" id="resumeT"></span></button>`;
   }
 
   function lastFor(id) {
@@ -245,21 +236,17 @@
     const day = t => { const x = new Date(t); x.setHours(0, 0, 0, 0); return x.getTime(); };
     const n = Math.round((day(Date.now()) - day(r.started_at)) / 86400000);
     const when = n <= 0 ? "Today" : n === 1 ? "Yesterday" : `${n} days ago`;
-    return `${when} · ${r.set_count} sets`;
+    return `${when} · ${setsN(r.set_count)}`;
   }
 
   function renderList(part) {
     curPart = part;
     const P = PARTS[part];
-    setTone(part);
     $("listFig").innerHTML = figure(part);
-    $("listFig").style.setProperty("--pt", `var(${P.tone})`);
     $("listTitle").textContent = P.name;
-    $("listSub").textContent = `${EX[part].length} exercises`;
-    $("exs").innerHTML = EX[part].map(([id, name, eq, target], i) => `
-      <button class="card ex rise${active() && s.ex.id === id ? " active" : ""}" type="button" data-ex="${id}" style="--pt:var(${P.tone});--i:${i}">
-        <span class="glyph"><svg viewBox="0 0 24 24">${EQUIP[eq][1]}</svg></span>
-        <span><div class="name">${name}</div></span>
+    $("exs").innerHTML = EX[part].map(([id, name], i) => `
+      <button class="card ex rise${active() && s.ex.id === id ? " active" : ""}" type="button" data-ex="${id}" style="--i:${i}">
+        <span class="name">${name}</span>
         <span class="last">${active() && s.ex.id === id ? "In progress" : lastFor(id)}</span>
       </button>`).join("");
     show("list");
@@ -269,7 +256,6 @@
     const ex = findEx(id);
     if (!s.ex || s.ex.id !== id) { s = fresh({ id: ex.id, name: ex.name, part: ex.part }); save(); }
     curPart = ex.part;
-    setTone(ex.part);
     $("exName").textContent = ex.name;
     show("timer");
     renderStatus();
@@ -308,38 +294,28 @@
   });
 
   /* ---------- Timer ---------- */
-  const pad = $("pad"), statusEl = $("status"), hintEl = $("hint"), endBtn = $("endBtn");
+  const pad = $("pad"), hintEl = $("hint"), endBtn = $("endBtn");
 
-  const hintFor = () => s.phase === "rest" ? "Double-tap to start the next set" : "Double-tap when the set is done";
+  const hintFor = () => s.phase === "rest" ? `Double-tap to start set ${s.set + 1}` : "Double-tap to end the set";
   function renderStatus() {
-    if (view === "timer") {
-      document.body.dataset.phase = s.phase;
-      document.body.style.setProperty("--tone", s.phase === "rest" ? "var(--mist)" : "var(--red)");
-    }
-    let html = "";
+    if (view === "timer") document.body.dataset.phase = s.phase;
     if (s.phase === "idle") {
-      html = `<div class="line now">Set 1 in progress</div>`;
       $("setLabel").textContent = "SET 1";
     } else if (s.phase === "rest") {
-      html = `<div class="line done">Set ${s.set} complete</div><div class="line now" style="--i:1">Break ${s.set} in progress</div>`;
       const nw = s.plan && s.set < s.plan.sets ? wFor(s.set + 1) : null;
       $("setLabel").textContent = "BREAK " + s.set + (nw != null ? ` · NEXT ${fmtKg(nw)} KG` : "");
     } else {
-      html = s.set === 1 ? `<div class="line now">Set 1 in progress</div>`
-        : `<div class="line done">Set ${s.set - 1} complete</div><div class="line done" style="--i:1">Break complete</div>
-              <div class="line now" style="--i:2">Set ${s.set} in progress</div>`;
       const w = wFor(s.set);
       $("setLabel").textContent = `SET ${s.set}${s.plan ? " / " + s.plan.sets : ""}${w != null ? ` · ${fmtKg(w)} KG` : ""}`;
     }
     const planDone = !!(s.plan && s.phase === "rest" && s.set >= s.plan.sets);
-    hintEl.textContent = planDone ? "All planned sets done · tap End" : hintFor();
+    hintEl.textContent = planDone ? "All sets done" : hintFor();
     endBtn.classList.toggle("cue", planDone);
-    statusEl.innerHTML = html;
     renderLog();
     endBtn.disabled = s.phase === "idle";
     const idle = s.phase === "idle";
     $("timerBack").hidden = !idle;
-    [$("clock"), statusEl, $("foot"), endBtn, $("setLabel")].forEach(el => el.hidden = idle);
+    [$("clock"), $("foot"), endBtn, $("setLabel")].forEach(el => el.hidden = idle);
     setCallout();
     renderReps();
     renderSetup();
@@ -386,7 +362,7 @@
       updateDone();
     } else {
       const ws = s.plan.weights.slice(0, s.plan.sets).map(fmtKg);
-      $("suSummary").innerHTML = `<b>${s.plan.sets}</b><small>SETS</small><span>${ws.join(" / ")} kg</span><em>EDIT</em>`;
+      $("suSummary").innerHTML = `<b>${s.plan.sets}</b><small>SETS</small><span>${ws.join(" / ")} KG</span><em>EDIT</em>`;
     }
   }
   function buildWeights() {
@@ -395,8 +371,7 @@
     s.plan.weights.length = n;
     suList.innerHTML = Array.from({ length: n }, (_, i) => `
       <label class="su-row"><span>SET ${i + 1}</span>
-        <input id="suw${i}" data-i="${i}" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="${i < n - 1 ? "next" : "done"}" placeholder="0" value="${String(s.plan.weights[i] ?? "").replace(/"/g, "")}">
-        <small>kg</small></label>`).join("");
+        <input id="suw${i}" data-i="${i}" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="${i < n - 1 ? "next" : "done"}" placeholder="0" value="${String(s.plan.weights[i] ?? "").replace(/"/g, "")}"></label>`).join("");
     suBuiltFor = n;
   }
   function updateDone() { $("suDone").disabled = !s.plan.weights.slice(0, s.plan.sets).every(validKg); }
@@ -501,7 +476,7 @@
     save(); keepAwake();
     startBtn.classList.remove("launch", "pressed");
     renderStatus();
-    if (!rm) [$("time"), statusEl, $("foot")].forEach((el, i) => el.animate(
+    if (!rm) [$("time"), $("foot")].forEach((el, i) => el.animate(
       [{ opacity: 0, transform: "translateY(10px) scale(.98)" }, { opacity: 1, transform: "none" }],
       { duration: 700, delay: i * 90, easing: "cubic-bezier(.2,.7,.1,1)", fill: "backwards" }));
     starting = false;
@@ -553,7 +528,7 @@
   /* ---------- Fighting-game style fly-by above the clock ---------- */
   // "SET n" / "BREAK n" flies in from the right into its own lane above the clock,
   // lands with a flash and shake, holds, then flies off to the left.
-  const stage = $("stage"), stageText = $("stageText"), stageBand = stage.querySelector(".stage-band");
+  const stage = $("stage"), stageText = $("stageText");
   let stageRun = 0;
   function setCallout() {}
   function announce() {
@@ -571,10 +546,10 @@
     // Same distance, duration and fast-start curve in and out; still in the middle.
     const IN = 180, HOLD = 900, D = IN * 2 + HOLD, T = IN / D;   // snap in, hard stop, hold, snap out
     stageText.animate([
-      { transform: "translateX(85vw) skewX(-12deg) scaleX(1.1)", opacity: .55, easing: "linear" },
-      { transform: "translateX(0) skewX(-12deg) scaleX(1)", opacity: 1, offset: T, easing: "linear" },
-      { transform: "translateX(0) skewX(-12deg) scaleX(1)", opacity: 1, offset: 1 - T, easing: "linear" },
-      { transform: "translateX(-85vw) skewX(-12deg) scaleX(1.1)", opacity: .55 }
+      { transform: "translateX(85vw)", opacity: 0, easing: "linear" },
+      { transform: "translateX(0)", opacity: 1, offset: T, easing: "linear" },
+      { transform: "translateX(0)", opacity: 1, offset: 1 - T, easing: "linear" },
+      { transform: "translateX(-85vw)", opacity: 0 }
     ], { duration: D, easing: "linear", fill: "both" }).finished.then(end, () => {});
     setTimeout(() => {
       if (run !== stageRun) return;
@@ -645,8 +620,6 @@
   let lastTap = 0, armT = null;
   pad.addEventListener("pointerup", e => {
     if (e.target.closest("button, .reps, .reps-done") || s.phase === "idle") return;
-    pad.style.setProperty("--tx", e.clientX + "px");   // tap glow spreads from the finger
-    pad.style.setProperty("--ty", e.clientY + "px");
     const now = performance.now();
     if (now - lastTap < GAP) {
       lastTap = 0; delete pad.dataset.armed; clearTimeout(armT); advance();
@@ -735,19 +708,18 @@
 
   function renderHist() {
     const h = loadHistory();
-    if (!h.length) { histEl.innerHTML = `<div class="empty">No workouts saved yet. Finish an exercise with End and choose Save.</div>`; return; }
+    if (!h.length) { histEl.innerHTML = `<div class="empty">No workouts yet</div>`; return; }
     histEl.innerHTML = h.map(r => `
       <div class="row" data-id="${r.id}" role="button" tabindex="0">
-        <span class="when">${(findEx(r.exercise_id) || {}).name || r.exercise_name || "Workout"}<small>${dateLabel(r.started_at)}${r.body_part && PARTS[r.body_part] ? " · " + PARTS[r.body_part].name : ""}</small></span>
-        <span class="meta">${r.set_count} sets</span>
-        <span class="meta">${fmtShort(r.duration_ms)}</span>
-        <span class="rests">${setsLine(r)}${r.breaks.length ? "Rest " + r.breaks.map(b => fmt(b.duration_ms)).join(" · ") : "No rests"}</span>
+        <span class="when">${(findEx(r.exercise_id) || {}).name || r.exercise_name || "Workout"}<small>${dateLabel(r.started_at)}</small></span>
+        <span class="meta">${setsN(r.set_count)} · ${fmtShort(r.duration_ms)}</span>
+        ${setsLine(r) ? `<span class="rests">${setsLine(r)}</span>` : ""}
       </div>`).join("");
   }
   function setsLine(r) {
     const S = r.sets || [];
-    if (S.some(x => x.weight != null)) return "Sets " + S.map(x => (x.weight != null ? fmtKg(x.weight) : "–") + (x.reps != null ? "×" + x.reps : "")).join(" · ") + "<br>";
-    if (S.some(x => x.reps != null)) return "Reps " + S.map(x => x.reps ?? "–").join(" · ") + "<br>";
+    if (S.some(x => x.weight != null)) return S.map(x => (x.weight != null ? fmtKg(x.weight) : "–") + (x.reps != null ? "×" + x.reps : "")).join("  ");
+    if (S.some(x => x.reps != null)) return S.map(x => "×" + (x.reps ?? "–")).join("  ");
     return "";
   }
   function openSheet() {
@@ -763,18 +735,18 @@
     const r = loadHistory().find(x => x.id === id); if (!r) return;
     dtId = id;
     $("dtTitle").textContent = (findEx(r.exercise_id) || {}).name || r.exercise_name || "Workout";
-    $("dtSub").textContent = `${dateLabel(r.started_at)} · ${r.set_count} sets · ${fmtShort(r.duration_ms)}`;
+    $("dtSub").textContent = `${dateLabel(r.started_at)} · ${setsN(r.set_count)} · ${fmtShort(r.duration_ms)}`;
     dtSets.innerHTML = (r.sets || []).map((x, i) => `
       <div class="dt-row"><span>S${x.n ?? i + 1}</span>
         <input data-i="${i}" data-k="weight" type="text" inputmode="decimal" autocomplete="off" placeholder="–" value="${x.weight ?? ""}" aria-label="Set ${i + 1} weight in kg">
         <input data-i="${i}" data-k="reps" type="text" inputmode="numeric" autocomplete="off" placeholder="–" value="${x.reps ?? ""}" aria-label="Set ${i + 1} reps">
         <em>${x.duration_ms != null ? fmtShort(x.duration_ms) : "—"}</em></div>`).join("") || `<div class="empty">No sets recorded.</div>`;
     histEl.hidden = true; $("mainActions").hidden = true; dtEl.hidden = false;
-    $("sheetTitle").textContent = "Edit";
+    document.querySelector(".sheet-head").hidden = true;
   }
   function closeDetail(quiet) {
     dtId = null; dtEl.hidden = true; histEl.hidden = false; $("mainActions").hidden = false;
-    $("sheetTitle").textContent = "History";
+    document.querySelector(".sheet-head").hidden = false;
     if (!quiet) renderHist();
   }
   histEl.addEventListener("click", e => { const row = e.target.closest(".row[data-id]"); if (row) openDetail(row.dataset.id); });
@@ -818,12 +790,12 @@
         ok: pend,
         syncing: "",
         offline: st.pending ? `Offline · ${pend}` : "",
-        error: `Not synced: ${st.message}${pend ? " · " + pend : ""}`,
+        error: `Not synced${pend ? " · " + pend : ""}`,
         off: pend
       }[st.status] || "";
       syncNote.textContent = text;
       syncNote.hidden = !text;
-      syncNote.style.color = st.status === "error" ? "var(--warm)" : "";
+      syncNote.classList.toggle("err", st.status === "error");
       if (!sheet.hidden && st.status === "ok") renderHist();
       if (view === "list" && st.status === "ok") {
         // refresh "Last" labels after a pull
@@ -853,17 +825,17 @@
     e.preventDefault();
     if (gateForm.classList.contains("busy")) return;
     const v = gateInput.value;
-    if ((window.GTStore ? window.GTStore.normalize(v) : v).length !== 8) { gateForm.classList.add("bad"); gateMsg.textContent = "Codes have 8 characters."; return; }
+    if ((window.GTStore ? window.GTStore.normalize(v) : v).length !== 8) { gateForm.classList.add("bad"); gateMsg.textContent = "Enter all 8 characters"; return; }
     gateForm.classList.add("busy"); gateMsg.textContent = "Checking…";
     try {
       const ok = await window.GTSync.redeem(v);
-      if (!ok) { gateForm.classList.remove("busy"); gateForm.classList.add("bad"); gateMsg.textContent = "That code isn't valid."; gateInput.select(); return; }
+      if (!ok) { gateForm.classList.remove("busy"); gateForm.classList.add("bad"); gateMsg.textContent = "Code not found"; gateInput.select(); return; }
       gateMsg.textContent = "";
       gateInput.blur();
       go("fwd", () => { s = fresh(); save(); renderHome(); });
     } catch (err) {
       gateForm.classList.remove("busy");
-      gateMsg.textContent = /offline/i.test(err.message || "") || !navigator.onLine ? "You're offline. Connect to sign in." : "Couldn't reach the server. Try again.";
+      gateMsg.textContent = /offline/i.test(err.message || "") || !navigator.onLine ? "You're offline" : "Couldn't connect. Try again.";
     }
   });
   $("signOutBtn").addEventListener("click", () => {
@@ -872,7 +844,7 @@
     window.GTSync.signOut();
     showGate();
   });
-  if (window.GTSync) window.GTSync.onChange(st => { if (st.status === "revoked") showGate("This code is no longer active."); });
+  if (window.GTSync) window.GTSync.onChange(st => { if (st.status === "revoked") showGate("This code is no longer active"); });
 
   /* ---------- Boot ---------- */
   if (s.ex && !findEx(s.ex.id)) s = fresh();

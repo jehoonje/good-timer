@@ -4,7 +4,7 @@
 
 ## 구조
 - 빌드 없는 정적 사이트 (Vercel에 그대로 배포)
-- `index.html`, `styles.css`, `app.js` — 앱
+- `index.html`, `ui.css`, `app.js` — 앱
 - `sync.js` — Supabase 동기화 (로컬 먼저 저장 → 익명 로그인 사용자로 `gt_sessions`에 업서트)
 - `config.js` — Supabase URL과 publishable 키 (공개 키, 접근 제어는 RLS)
 - `supabase/migrations/` — 테이블/RLS 정의
