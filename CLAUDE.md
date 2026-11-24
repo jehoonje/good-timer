@@ -1,6 +1,6 @@
 # Good Timer
 
-Static PWA (no build): `index.html`, `ui.css`, `app.js`, `sync.js`, `config.js`. Supabase for history sync (access-code accounts, RLS keyed by `account_code`).
+Static PWA (no build): `index.html`, `styles.css` + `ps2.css` (theme layer, later rules win), `app.js`, `sync.js`, `config.js`. Supabase for history sync (access-code accounts, RLS keyed by `account_code`).
 Never commit access-code values.
 
 ## UI 디자인 원칙
@@ -47,8 +47,9 @@ Never commit access-code values.
 ### 작업 방식
 - 새 화면을 만들거나 수정한 뒤, 위 원칙을 기준으로 스스로 점검하고 위반 사항이 있으면 고친 다음 결과를 보여줘.
 
-## How the principles map to this codebase (`ui.css` tokens)
-- Primary: `--primary` (blue) — selection, primary button, focus, muscle highlight. Point: `--accent` (red) — a running set, and destructive confirm only. Everything else is grey.
-- Type levels: `--fs-display` (clock + SET/BREAK callout, timer only) / `--fs-title` / `--fs-body` / `--fs-aux`; any one screen uses at most three.
-- One shape for all buttons, cards and chips: `--r` radius + 1px `--line`. Primary button = filled `--primary`; secondary = line only.
+## Owner decisions that override the principles above
+- Keep the PS2-style look and the current UX (timer flow, START ring, status lines, callout, history layout). Restyle requests are visual-only unless the owner asks otherwise.
+- The blue-void background gradient and the red/grey phase gradients stay (owner's choice). No new gradients elsewhere.
+- No icons inside exercise cards; no glow or blur behind the body figures.
+- Font: Nunito for text and numbers (tabular digits keep the clock still).
 - UI copy is English (owner's choice); keep it short, no explanatory sentences.
