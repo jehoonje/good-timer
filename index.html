@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Good Timer</title>
-<meta name="theme-color" content="#06080d">
+<meta name="theme-color" content="#02070b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,10 +13,14 @@
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Rajdhani:wght@500;600&family=Share+Tech+Mono&display=swap">
-<link rel="stylesheet" href="/ui.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&family=Sora:wght@200;300;400&family=IBM+Plex+Sans+KR:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/ps2.css">
 </head>
 <body>
+<div class="glow" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="grain" aria-hidden="true"></div>
+
 <!-- Access code -->
 <section class="view" id="gate" hidden>
   <form class="gate" id="gateForm" autocomplete="off" novalidate>
@@ -51,7 +55,8 @@
     <div class="fig" id="listFig"></div>
     <div>
       <h1 id="listTitle"></h1>
-          </div>
+      <div class="eyebrow" id="listSub"></div>
+    </div>
   </div>
   <div class="exs" id="exs"></div>
 </section>
@@ -82,7 +87,7 @@
         <button type="button" class="pill primary" id="suNext">Next</button>
       </div>
       <div class="su-step" id="suWeights" hidden>
-        <div class="su-label">KG</div>
+        <div class="su-label">WEIGHT · KG</div>
         <div class="su-list" id="suList"></div>
         <div class="su-actions">
           <button type="button" class="pill quiet" id="suBack">Back</button>
@@ -91,15 +96,16 @@
       </div>
       <button type="button" class="su-summary" id="suSummary" hidden></button>
     </div>
-    <button class="start" id="startBtn" type="button" aria-label="Start">
+    <button class="start" id="startBtn" type="button" aria-label="Start set 1">
       <span class="halo" aria-hidden="true"></span>
       <span class="rim" aria-hidden="true"></span>
-      <span class="face"><span class="lbl">START</span></span>
+      <span class="face"><span class="lbl">START</span><small>SET 1</small></span>
     </button>
-    <div class="stage" id="stage" hidden aria-hidden="true"><span id="stageText"></span></div>
+    <div class="stage" id="stage" hidden aria-hidden="true"><span class="stage-band"></span><span id="stageText"></span></div>
     <div class="clock" id="clock">
       <div id="time"><span id="mm">0:00</span><span class="cs" id="cs">.00</span></div>
     </div>
+    <div class="status" id="status" aria-live="polite"></div>
   </div>
   <div class="foot" id="foot">
     <div class="reps" id="reps" hidden>

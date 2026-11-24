@@ -1,6 +1,6 @@
 # Good Timer
 
-Static PWA (no build): `index.html`, `ui.css`, `app.js`, `sync.js`, `config.js`. Supabase for history sync (access-code accounts, RLS keyed by `account_code`).
+Static PWA (no build): `index.html`, `styles.css` + `ps2.css` (theme layer, later rules win), `app.js`, `sync.js`, `config.js`. Supabase for history sync (access-code accounts, RLS keyed by `account_code`).
 Never commit access-code values.
 
 ## UI 디자인 원칙
@@ -48,8 +48,8 @@ Never commit access-code values.
 - 새 화면을 만들거나 수정한 뒤, 위 원칙을 기준으로 스스로 점검하고 위반 사항이 있으면 고친 다음 결과를 보여줘.
 
 ## Owner decisions that override the principles above
-- Base look: the flat restyle in `ui.css` (1px lines, one button shape, Rajdhani + Share Tech Mono, blue primary, red = a running set).
-- Kept from the earlier PS2 look, by the owner's choice: the blue-void background gradient with the red (set) / grey (break) floor; the red glow on the clock during a set; the flying SET/BREAK callout (Anton, gradient fill, skewed fly-by); the START wire ring (turning, press pulls in, launch flings out) with PRESS START. No new gradients or glows beyond these.
-- No icons inside exercise cards; no glow or blur behind the body figures.
-- Panels over other content (sheet, modal, toast) are opaque.
+- Keep the ps2 look and UX as they are (gradients, glows, START ring, status lines, SET/BREAK callout, fonts). Change only what the owner asks.
+- No icons inside exercise cards; the card shows the name and, if done before, when it was last done ("3 days ago").
+- No glow or blur behind/around the body figures.
+- History sheet and End modal use the clean panel style: 1px lines, 8px radius, flat rows, filled primary button, translucent background.
 - UI copy is English (owner's choice); keep it short, no explanatory sentences.
